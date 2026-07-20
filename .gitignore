@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Environment & Secrets
+.env
+*.env
+config.yaml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Node / Frontend
+node_modules/
+
+# Database
+*.db
+*.sqlite
+*.backup.sql
+
+# Development artifacts
+task_plan.md
+progress.md
+findings.md
+release*.json
+RELEASE_NOTES_*.md
+
+# Project tracking
+.hermes/
+.workbuddy/
+.joycode/
+.obsidian/
+
+# Git hooks (user manages their own)
+.githooks/
