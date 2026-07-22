@@ -8,12 +8,13 @@ tags:
   - ops
   - reliability
 created: 2026-07-18
+updated: 2026-07-21
 status: draft
 ---
 
 # Kairos 可靠性策略
 
-> **文档定位：** 描述 Kairos 的备份、恢复、回滚策略和异常状态管理。系统架构设计见 `docs/kairos/architecture-v1.0.0.md`。
+> **文档定位：** 描述 Kairos 的备份、恢复、回滚策略和异常状态管理。系统架构设计见 `docs/foundation/architecture-v1.0.0.md`。
 
 ---
 
@@ -21,14 +22,17 @@ status: draft
 
 ### 1.1 常驻契约回滚
 
-升华层每次运行前自动备份：
+升华层每次运行前自动创建数据库快照：
 
 ```
-~/.kairos/backups/core/20260714.md
-~/.kairos/backups/core/20260715.md
+# SQLite
+cp ~/.kairos/kairos.db ~/.kairos/backups/kairos-$(date +%Y%m%d-%H%M%S).db
+
+# PostgreSQL
+pg_dump -d kairos -f ~/.kairos/backups/kairos-$(date +%Y%m%d-%H%M%S).sql
 ```
 
-最多保留最近 30 天备份。恢复方式：手动复制备份覆盖。
+最多保留最近 30 天备份。恢复方式：手动复制备份覆盖或 `psql -f <dump>`。
 
 ### 1.2 数据库回滚
 
@@ -41,7 +45,7 @@ status: draft
 
 ### 1.3 数据可靠性设计
 
-写入路径设计见架构文档 §3.3「数据可靠性契约」。核心原则：写入确认基于内存缓冲收讫而非落盘确认，缓冲层有持久化兜底。
+写入路径设计见架构文档 §4「存储层（缓冲写入）」。核心原则：写入确认基于内存缓冲收讫而非落盘确认，缓冲层有持久化兜底。
 
 ### 1.4 异常状态管理
 
@@ -57,7 +61,7 @@ status: draft
 
 ### 1.5 LLM 调用超时与熔断
 
-架构文档 §6.4 定义了成本护栏的高层参数。以下为超时重试与熔断的具体策略：
+架构文档 §8.1 定义了跨层三环不变量。以下为超时重试与熔断的具体策略：
 
 | 控制项 | 默认值 | 说明 |
 |:------|:-------|:-----|
@@ -76,11 +80,11 @@ status: draft
 | 组件 | 自动恢复 RTO | 总恢复 RTO | RPO | 恢复方式 |
 |:----|:-----------:|:----------:|:----:|:--------|
 | Kairos API | ≤ 30s | ≤ 5 分钟 | ≤ 1 天 | 容器重启（自动拉起）；总 RTO 含手动干预 |
-| 调度器 | ≤ 30s | ≤ 5 分钟 | 0（无状态） | 重启后自动从数据库恢复上下文 |
-| 数据库 | ≤ 30s | ≤ 30 分钟 | ≤ 1 天（全量备份）/ ≤ 5 分钟（WAL） | 全量 + WAL 回放；自动恢复仅用于 WAL 回档 |
+| Kairos API（无状态） | — | — | — | API 不持有需恢复的数据 |
+| 数据库 | ≤ 30s | ≤ 30 分钟 | ≤ 5 分钟（WAL） | 全量 + WAL 回放；自动恢复仅用于 WAL 回档；**RPO ≤ 5 分钟**，与 requirements-baseline §2 一致性基线对齐 |
 | 升华层 | ≤ 30s | ≤ 5 分钟 | ≤ 1 天 | 重启后从 events 表恢复未完成阶段 |
 
-> **说明：** 自动恢复 RTO 目标对齐 NFR（`design/nfr-specification.md` §三 故障恢复 ≤30s），适用于自动容器重启/sidecar 恢复场景。总恢复 RTO 涵盖需要备份回放的人工介入场景。
+> **说明：** 自动恢复 RTO 目标对齐 NFR（`specification/nfr-specification.md` §三 故障恢复 ≤30s），适用于自动容器重启/sidecar 恢复场景。总恢复 RTO 涵盖需要备份回放的人工介入场景。
 
 ---
 
@@ -89,8 +93,8 @@ status: draft
 | 备份对象 | 频率 | 保留期 | 存储位置 |
 |:--------|:----|:-------|:--------|
 | 常驻契约文件 | 升华前 | 30 天 | `~/.kairos/backups/core/` |
-| 数据库全量 | 每日 05:00 | 30 天 | 备份目录 + 可选远程 |
-| 数据库 WAL | 持续 | 7 天 | 本地磁盘 |
+|- **数据库全量** | 每日 05:00 | 30 天 | 备份目录 + 可选远程 |
+|- **数据库 WAL** | 持续（由 `KAIROS_WAL_ARCHIVE_COMMAND` 触发） | `KAIROS_WAL_ARCHIVE_RETENTION_DAYS`（默认 7 天） | `~/.kairos/wal_archive/` |
 
 ---
 

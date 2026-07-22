@@ -1,0 +1,45 @@
+# Kairos 领域关键词知识库
+# 格式：{domain_name: [zh_keywords, en_keywords]}
+# 用于领域路由检索（architecture §10.16 / §3.1）
+# v1.0 种子版本：每域 5-7 个关键词，无同义词/权重/匹配规则。
+# 代码启动后根据实际使用数据自动扩展关键词库并引入 TF-IDF 权重。
+
+management_science:
+  - [运筹学, 供应链, 决策分析, 库存, 物流]
+  - [operations research, supply chain, decision analysis, inventory, logistics]
+
+ai:
+  - [人工智能, 机器学习, 深度学习, 强化学习, 神经网络]
+  - [artificial intelligence, machine learning, deep learning, neural network, reinforcement learning]
+
+nlp:
+  - [自然语言处理, 文本分类, 命名实体, 情感分析, 机器翻译]
+  - [natural language processing, text classification, named entity, sentiment analysis, machine translation]
+
+computer_vision:
+  - [计算机视觉, 图像识别, 目标检测, 语义分割, OCR]
+  - [computer vision, image recognition, object detection, semantic segmentation]
+
+recommender_system:
+  - [推荐系统, 协同过滤, 矩阵分解, 召回, 排序]
+  - [recommender system, collaborative filtering, matrix factorization, recall, ranking]
+
+programming:
+  - [编程, Python, TypeScript, Rust, 代码, 算法, 数据结构]
+  - [programming, Python, TypeScript, Rust, code, algorithm, data structure]
+
+database:
+  - [数据库, SQL, NoSQL, 索引, 查询优化, 迁移]
+  - [database, SQL, NoSQL, index, query optimization, migration]
+
+security:
+  - [安全, 加密, 认证, 授权, 审计, 红线]
+  - [security, encryption, authentication, authorization, audit]
+
+system_design:
+  - [系统设计, 架构, 分布式, 微服务, 高可用]
+  - [system design, architecture, distributed, microservice, high availability]
+
+research_methodology:
+  - [研究方法, 实验设计, 统计分析, 论文, 文献综述]
+  - [research methodology, experimental design, statistical analysis, paper, literature review]

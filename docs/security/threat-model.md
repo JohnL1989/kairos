@@ -7,12 +7,13 @@ tags:
   - kairos
   - security
 created: 2026-07-18
+updated: 2026-07-21
 status: draft
 ---
 
 # Kairos 威胁模型与安全对抗
 
-> **文档定位：** 系统威胁模型分析。安全红线（S-01~S-16）见 `docs/kairos/architecture-v1.0.0.md` §7。本文件为 STRIDE 映射的完整展开。
+> **文档定位：** 系统威胁模型分析。安全红线（S-01~S-17）见 `docs/foundation/architecture-v1.0.0.md` §8。本文件为 STRIDE 映射的完整展开。
 
 ---
 
@@ -21,21 +22,34 @@ status: draft
 | 等级 | 描述 | 覆盖措施 |
 |:----|:-----|:--------|
 | **L1（本地进程）** | 同机进程攻击 API | API Key 认证（S-01）+ 限流（S-02） |
-| **L2（同网段）** | 同网段设备尝试访问 | 127.0.0.1 绑定（S-04）+ admin IP 白名单（S-08） |
+| **L2（同网段）** | 同网段设备尝试访问 | 127.0.0.1 绑定（S-04）+ admin Key 限制（S-08） |
 | **L3（LLM 供应商）** | 调用 LLM 时的数据外泄 | 敏感信息脱敏（S-07）+ 按需发送不批量导出 |
 
 ---
 
 ## 二、STRIDE 映射
 
-| 威胁类型 | 攻击面 | 受影响组件 | 防护措施 |
-|:--------|:-------|:----------|:--------|
-| **Spoofing** | API Key 伪造 | API 层 | PBKDF2 哈希 + 三级权限（S-01/S-02/S-06） |
-| **Tampering** | 记忆内容篡改 / 注入 XSS | 写入路径 + 导出路径 | 常驻契约写入前扫描（S-09）：prompt injection / 角色劫持 / 后门 / 隐形 Unicode；导出接口 HTML 实体编码（归入 S-07 脱敏） |
-| **Repudiation** | 操作抵赖 | 写入路径 | 审计记录每次变更的操作者/时间/content_hash |
-| **Information Disclosure** | 敏感信息通过 LLM 调用泄露 | 搜索路径 + LLM 调用 | S-04 本地绑定 + 按需搜索不跨路径 + 临时契约不写回 |
-| **Denial of Service** | 大量写入耗尽存储 | API 写入路径 | 写操作限流 60/min（S-02/S-03，单客户端防滥用）+ 单条内容上限 64KB。说明：威胁模型的写限流（60/min/客户端）与 NFR 写入吞吐目标（≥100 ops/s 系统级）为不同维度的约束——前者限制单源速率，后者衡量系统可持续处理能力。架构部署时应同时满足两者 |
-| **Elevation of Privilege** | 越权执行管理操作 | 管理端点 | admin Key 三级权限 + IP 白名单（S-06/S-08） |
+### 风险评分矩阵
+
+每条威胁按 **可能性（1-5）** × **影响（1-5）** 评分，总分 1-25：
+
+| 等级 | 总分 | 响应 |
+|:----|:----|:-----|
+| **Critical** | 15-25 | 必须修复后方可发布 |
+| **High** | 10-14 | 必须在发布前制定缓解方案 |
+| **Medium** | 5-9 | 接受或记录在案 |
+| **Low** | 1-4 | 接受 |
+
+### STRIDE 映射表
+
+| 威胁类型 | 攻击面 | 可能性 | 影响 | 总分 | 受影响组件 | 防护措施 |
+|:--------|:-------|:------:|:----:|:----:|:----------|:--------|
+| **Spoofing** | API Key 伪造 | 2 | 4 | **8(M)** | API 层 | PBKDF2 哈希 + 三级权限（S-01/S-06） |
+| **Tampering** | 记忆内容篡改 / 注入 XSS | 2 | 3 | **6(M)** | 写入路径 + 导出路径 | 常驻契约写入前扫描（S-09）：prompt injection / 角色劫持 / 后门 / 隐形 Unicode；导出接口 HTML 实体编码（归入 S-07 脱敏） |
+| **Repudiation** | 操作抵赖 | 1 | 3 | **3(L)** | 写入路径 | 审计记录每次变更的操作者/时间/content_hash（S-16 定向遗忘留痕）+ 结构性反例 P6 审计日志强制留存（S-17） |
+| **Information Disclosure** | 敏感信息通过 LLM 调用泄露 | 3 | 4 | **12(H)** | 搜索路径 + LLM 调用 | S-04 本地绑定 + 按需搜索不跨路径 + 临时契约不写回 |
+| **Denial of Service** | 大量写入耗尽存储 | 2 | 2 | **4(L)** | API 写入路径 | 写入限流分层：单客户端建议 ≤60/min（S-02，令牌桶，约 1 ops/s），系统级硬上限 500 ops/s（熔断，S-02）。系统级容量目标 ≥100 ops/s（多客户端并行）。单条内容上限 64KB（S-03 超长输入拒绝）。说明：客户端级限流与系统级容量不矛盾，详见 ops/configuration.md §7 限流声明 |
+| **Elevation of Privilege** | 越权执行管理操作 | 1 | 5 | **5(M)** | 管理端点 | admin Key 三级权限（S-06/S-08） |
 
 ---
 
@@ -44,7 +58,7 @@ status: draft
 | 攻击 | 场景 | 防护 |
 |:-----|:-----|:-----|
 | 提示注入致令牌耗尽 | 恶意 prompt 反复触发 LLM 调用 | 单次调用成本上限 + 日预算上限 |
-| 适配器 SSRF | Embedding/LLM 端点 SSRF | 出站 URL 白名单 + 解析后二次 IP 校验（阻断指向内网/元数据服务的请求）+ DNS 重绑定防护 |
+| 适配器 SSRF | Embedding/LLM 端点 SSRF | 出站 URL 白名单（`KAIROS_SSRF_ALLOWED_HOSTS`）+ 解析后二次 IP 校验（`KAIROS_SSRF_IP_CHECK`、阻断指向内网/元数据服务的请求）+ DNS 重绑定防护（`KAIROS_SSRF_DNS_REBIND_PROTECTION`） |
 | prompt 泄露 | 生成内容含敏感系统提示 | 敏感信息打标，LLM 输出不包含系统提示 |
 | 成本炸弹 | 大量小请求累积日预算 | 单 run 成本熔断 + 日累计上限（重试计入同一次 run，不额外叠加） |
 | Judge 漂移 | LLM-as-Judge 评分偏离标准 | 黄金集回归 + 漂移告警 |
@@ -62,17 +76,20 @@ status: draft
 | S-13 | 模拟隔离区产物未经实证即进入存储层 | WM 层模拟隔离区 | 模拟产物须经实证印证后方可合并，写入时标记 provenance 检查 |
 | S-14 | 使用权重变化反向写回见证锚定，使用频率冒充真实性 | 差异检验合并路径 | 使用权重永远不能反向写回叙事自洽度或见证锚定主副本，受差异检验强制执行 |
 | S-15 | 记忆缺少来源分类，无法区分外部校准与内部推演 | 写入路径 | 每条记忆必须记录来源类型，来源缺失返回 422 |
-| S-16 | 定向遗忘操作不留审计痕迹，合规擦除无法证明 | 宪法解释层授权流程 | 所有定向遗忘操作写入审计日志，标记 `directed_forgetting` 或 `identity_demotion` |
+| S-16 | 定向遗忘未留痕视为未执行 | 宪法解释层授权流程 | 所有定向遗忘操作写入审计日志，标记 `directed_forgetting` 或 `identity_demotion` |
+| S-17 | 结构性反例免于遗忘 | 遗忘调度器 / 压缩管道 | P6 闸门守护——反例类记忆不受遗忘调度器评估，结构反例在压缩/升华管道中强制保留 |
 
 ## 五、审计完整性
 
-审计日志使用 HMAC-SHA256 链式签名防止篡改：
+审计日志使用双字段链式签名防止篡改——明文 content_hash 链供按内容追踪，HMAC-SHA256 链供完整性校验：
 
 ```
 日志条目 N:
-  plaintext = timestamp + operator + action + content_hash + previous_hash
+  # 双字段链：明文 content_hash 链 + HMAC 完整性链
+  prev_content_hash = previous_entry.content_hash  # 明文链，供精确定位
+  plaintext = timestamp + operator + action + content_hash + prev_hmac  # prev_hmac 来自上一条
   hmac = HMAC-SHA256(hmac_key, plaintext)
-  stored = plaintext || hmac
+  # 存储：entry.content_hash + entry.hmac + entry.prev_hmac + entry.prev_content_hash
 
 校验：
   逐条重算 HMAC 并与存储值比对

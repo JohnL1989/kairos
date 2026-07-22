@@ -9,12 +9,14 @@ tags:
   - monitoring
 created: 2026-07-20
 updated: 2026-07-20
-status: v1.0.0
+status: draft
 ---
 
 # Kairos 可观测性设计
 
-> **定位**：定义 Kairos 系统的指标体系、结构化日志 schema、告警规则。架构文档定义了「做什么」，本文定义「如何看见做了什么」。
+| **定位**：定义 Kairos 系统的指标体系、结构化日志 schema、告警规则。架构文档定义了「做什么」，本文定义「如何看见做了什么」。
+>
+> **暴露协议**：指标通过 `/metrics` 端点以 Prometheus 文本格式暴露（端口 8010/metrics）。日志通过异步 I/O 写入 `~/.kairos/logs/`，按日轮转，保留 30 天。
 
 ---
 
@@ -34,7 +36,7 @@ status: v1.0.0
 | `kairos_forgetting_score` | Gauge | 遗忘得分分布 | bucket |
 | `kairos_budget_remaining_fen` | Gauge | LLM 日预算剩余（分） | provider |
 | `kairos_calibration_last_arrival` | Gauge | 距上次校准信号到达的秒数 | source |
-| `kairos_degradation_mode` | Gauge | 当前降级模式（0=正常 1=静默 2=受限验证 3=安全休眠） | — |
+| `kairos_degradation_mode` | Gauge | 当前降级模式（0=正常 1=静默 2=受限交叉验证 3=安全休眠） | — |
 
 ### 1.2 健康检查
 
@@ -82,10 +84,10 @@ status: v1.0.0
 | 告警名 | 条件 | 严重度 | 响应 |
 |:-------|:-----|:-------|:-----|
 | 数据库断连 | 健康检查连续 3 次失败 | critical | 人工介入 |
-| 写入延迟飙升 | P95 > 500ms 持续 5 分钟 | warning | 检查嵌入服务 |
-| 检索延迟飙升 | P95 > 800ms 持续 5 分钟 | warning | 检查 pgvector 索引 |
-| 校准中断警告 | 距上次校准 > N 周期 | info | 检查校准源 |
-| 校准中断严重 | 距上次校准 > M 周期 | warning | 触发降级 |
+| 写入延迟退化 | NFR 写入 P95 通过率 < 99% 持续 5 分钟 | warning | 检查嵌入服务 |
+| 检索延迟退化 | NFR 检索 P95 通过率 < 99% 持续 5 分钟 | warning | 检查 pgvector 索引 |
+| 校准中断警告 | 距上次校准 > 3 周期（=900s/15min） | info | 检查校准源 |
+| 校准中断严重 | 距上次校准 > 6 周期（=1800s/30min） | warning | 触发降级 |
 | 偏置告警 | 来源多样性收敛或校准衰减超阈 | warning | 人工审查 |
 | 正反馈告警 | 偏置在加速放大 | critical | 宪法解释层介入 |
 | 身份偏置告警 | 身份一致性记忆系统性压制异质记忆 | warning | 人工审查 |

@@ -1,0 +1,74 @@
+/* 字体：运行时若可联网则从 Google Fonts 加载，离线则回退系统字体 */
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap");
+@import "tailwindcss";
+
+@theme {
+  /* 表面层级 */
+  --color-canvas: #0a0a0b;
+  --color-panel: #0e0e11;
+  --color-card: #141417;
+  --color-line: #232327;
+  --color-selected: #1a263d;
+  --color-skeleton: #1e1e22;
+  --color-errbg: #2a1a1a;
+
+  /* 语义色 */
+  --color-accent: #18a0fb;
+  --color-ok: #14ae5c;
+  --color-warn: #f2c94c;
+  --color-err: #f24822;
+
+  /* 文字 */
+  --color-ink: #ffffff;
+  --color-ink-2: #d1d5db;
+  --color-ink-3: #9ca3af;
+  --color-ink-4: #6b7280;
+
+  /* 字体 */
+  --font-sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", "Consolas", monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-canvas);
+  color: var(--color-ink-2);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2f2f35;
+}
+
+/* 细滚动条 hide */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

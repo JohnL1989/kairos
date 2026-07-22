@@ -1,0 +1,78 @@
+version: "3.8"
+
+# ⚠️ Honcho（honcho-db / honcho-api / honcho-deriver）
+# 需要自行获取 `honcho:latest` 镜像，暂未公开发布。
+# 如无 Honcho，系统仍可运行但缺少实时结论提炼能力，
+# 记忆蒸馏（Amber TMT）不受影响。
+#
+# 详情见 docs/deployment.md：先跳过 Honcho，仅部署 Amber 即可体验核心功能。
+
+services:
+  # ── Amber（记忆蒸馏管道，核心组件，必须部署）──
+  amber-db:
+    image: pgvector/pgvector:pg17
+    container_name: amber-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: amber
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - amber-db-data:/var/lib/postgresql/data
+
+  amber-api:
+    build:
+      context: ./amber
+      dockerfile: Dockerfile
+    container_name: amber-api
+    restart: unless-stopped
+    env_file: ./amber.env
+    ports:
+      - "8010:8010"
+    depends_on:
+      - amber-db
+
+  # ── Honcho（实时记忆提炼，可选组件，需自行获取镜像）──
+  honcho-db:
+    image: pgvector/pgvector:pg17
+    container_name: honcho-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: honcho
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: honcho
+    ports:
+      - "5432:5432"
+    profiles:
+      - full
+    volumes:
+      - honcho-db-data:/var/lib/postgresql/data
+
+  honcho-api:
+    image: honcho:latest
+    container_name: honcho-api
+    restart: unless-stopped
+    profiles:
+      - full
+    env_file: ./honcho.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - honcho-db
+
+  honcho-deriver:
+    image: honcho:latest
+    container_name: honcho-deriver
+    restart: unless-stopped
+    profiles:
+      - full
+    env_file: ./honcho.env
+    command: python -m src.deriver
+    depends_on:
+      - honcho-db
+
+volumes:
+  amber-db-data:
+  honcho-db-data:

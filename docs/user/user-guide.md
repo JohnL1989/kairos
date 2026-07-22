@@ -9,12 +9,14 @@ tags:
   - guide
 created: 2026-07-20
 updated: 2026-07-20
-status: v1.0.0
+status: draft
 ---
 
 # Kairos 用户指南
 
-> **定位**：面向 Agent 开发者的操作文档。deployment 解决「怎么装」，本文解决「怎么用」。
+> **定位**：面向 Agent 开发者的操作文档。deployment 解决「怎么装」，本文解决「怎么用」。`kairos suppress` 为 v1.0 功能。
+>
+> **⚠ 草稿完善声明**：以下所有命令与 SDK 调用（`pip install kairos`、`from kairos import KairosClient` 等）为设计示例，当前无构建产物、无可执行命令、无 Python SDK。全部 CLI 命令（`kairos write`、`kairos search` 等）为虚构——当前文档处于设计冻结阶段，代码尚未启动。具体命令语法在代码实现后可能变化。读者应关注接口语义而非命令文本。
 
 ---
 
@@ -32,16 +34,42 @@ pip install kairos
 kairos init --db sqlite:///data/kairos.db
 ```
 
-### 1.2 环境变量
+### 1.2 首次部署（Key 引导流程）
+
+S-01 要求无有效 Key 拒绝启动。首次部署时通过 `kairos init --init-key` 预注入 Key，打破「先有 Key 才能启动」的循环：
+
+```bash
+# 1. 初始化数据库和配置（生成密钥文件）
+kairos init --db sqlite:///data/kairos.db --init-key
+
+# 2. 查看生成的 Key
+kairos config show KAIROS_API_KEY
+
+# 3. 正常启动（Key 已从配置文件加载）
+kairos serve --port 8010
+```
+
+`--init-key` 生成以下密钥并写入 `~/.kairos/secrets.yaml`：
+- `KAIROS_API_KEY` — API 鉴权
+- `KAIROS_SECRET_KEY` — 数据加密
+- `KAIROS_AUDIT_HMAC_KEY` — 审计链 HMAC
+- `KAIROS_SALT` — Salt 密钥（S-05 要求）
+
+> **注意**：`--init-key` 生成全部四个密钥（含 `KAIROS_SALT`）。这四个密钥是首次启动的必要条件——缺少任意一个均拒绝启动。
+
+### 1.3 环境变量
 
 | 变量 | 必填 | 默认值 | 说明 |
 |:----|:----|:-------|:-----|
+| `KAIROS_SALT` | ✅ | — | Salt 密钥（S-05 要求无 Salt 拒绝启动） |
 | `KAIROS_API_KEY` | ✅ | — | API Key（read/write/admin 三级） |
-| `KAIROS_DB_URL` | ✅ | — | 数据库连接 URL |
-| `KAIROS_LLM_API_KEY` | ❌ | — | LLM Provider API Key (升华/嵌入) |
+| `KAIROS_SECRET_KEY` | ✅ | — | 数据加密密钥 |
+| `KAIROS_AUDIT_HMAC_KEY` | ✅ | — | 审计链 HMAC 密钥 |
+| `KAIROS_DB_DSN` | ✅ | — | 数据库连接串 |
+| `KAIROS_LLM_API_KEY` | ✅ | — | LLM Provider API Key (升华/嵌入) |
 | `KAIROS_DAILY_BUDGET_FEN` | ❌ | 20000 | LLM 日预算（分，20000分=200元） |
 
-### 1.3 启动
+### 1.4 启动
 
 ```bash
 kairos serve --port 8010
@@ -55,7 +83,7 @@ kairos serve --port 8010
 ### 2.1 写入记忆
 
 ```python
-# 使用 KairosClient
+# 使用 KairosClient（目标 SDK，当前草稿完善阶段期无构建产物）
 from kairos import KairosClient
 
 client = KairosClient(api_key="sk-...")
@@ -64,7 +92,8 @@ client = KairosClient(api_key="sk-...")
 memory = client.write(
     path="kairos://sessions/abc123/",
     content="用户偏好：暗色主题",
-    contract="ondemand",       # 可选：permanent / ondemand / environmental / temporary
+    source="chat_input",         # S-15 要求来源标识
+    contract="ondemand",         # 可选：permanent / ondemand / environmental / temporary
 )
 
 print(f"写入成功：{memory.id}")
@@ -153,7 +182,8 @@ kairos status
 ### 3.4 种子锚点
 
 首次启动时系统需要种子锚点作为冷启动参考。建议：
-- 通过环境变量 `KAIROS_SEED_PATH` 指定种子目录
+# 种子路径设置
+KAIROS_SEED_PATH=~/.kairos/seeds/   # 可选。未设置则使用内置默认种子
 - 种子应尽量少而精确（最小化原则）
 - 系统会在运行中逐步退化为自产数据驱动
 
@@ -164,9 +194,9 @@ kairos status
 | 项 | 限制 | 绕过 |
 |:----|:-----|:-----|
 | 单条内容上限 | 64 KB | 分割为多条关联记忆 |
-| 路径深度 | ≤ 10 层 | 超深层路径自动截断 |
+| 路径深度 | ≤ 10 层 | 超深层路径拒绝（返回 400），缩短路径后重试 |
 | 单次检索返回条数 | ≤ 100 | 分页（offset/limit） |
-| 并发写入 | ≤ 100 ops/s | 队列缓冲 |
+| 并发写入 | ≤ 100 ops/s（建议单客户端上限） | 队列缓冲。系统级硬上限 500 ops/s（熔断），单客户端建议 ≤100 ops/s 以避免触发。能力目标 ≥100 ops/s（见 NFR 规格） |
 | 单 API Key 分级 | 三级权限预置 | 多 Key 轮换 |
 | 外部校准中断持续 | 超过配置阈值（DEGRADATION_PERIOD）周期进入安全休眠 | 恢复校准信号自动退出 |
 
