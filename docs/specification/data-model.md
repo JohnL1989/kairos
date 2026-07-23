@@ -8,7 +8,7 @@ tags:
   - design
   - data-model
 created: 2026-07-20
-updated: 2026-07-20
+updated: 2026-07-23
 status: draft
 ---
 
@@ -563,4 +563,4 @@ status: draft
 
 | 版本 | 日期 | 说明 |
 |:----|:----|:-----|
-| v1.0.0 | 2026-07-23 | 数据模型首版定稿。核心记忆表 29+ 字段（含 hall 知识加工区标识、calibration_confidence 校准置信度、VAD 情感三维、encoding_context 编码情境）。扩展字段：solution_branch_id（谱系分支）、distill_level（蒸馏层级 0-4）、extinction_status（灭绝状态）、lma_urn（MTL 逻辑地址）。双副本分离：witness_anchor 见证锚定表（含叙事自洽度/校准历史）与 usage_weight 使用权重表（含五级负载系数）。新增表：solution_branches 谱系分支表、extinction_fossils 知识化石表、memory_relations 关系索引表、vector_collections 向量集合表、community_detection 社区发现表。注册表逻辑结构（九类根键/路径/值类型/写入权限定义）。
+| v1.0.0 | 2026-07-23 | 数据模型设计定稿（文档仍保持 draft 状态——无运行代码验证）。核心记忆表 29+ 字段（含 hall 知识加工区标识、calibration_confidence 校准置信度、VAD 情感三维、encoding_context 编码情境）。扩展字段：solution_branch_id（谱系分支）、distill_level（蒸馏层级 0-4）、extinction_status（灭绝状态）、lma_urn（MTL 逻辑地址）。双副本分离：witness_anchor 见证锚定表（含叙事自洽度/校准历史）与 usage_weight 使用权重表（含五级负载系数）。新增表：solution_branches、extinction_fossils、memory_relations、entity_communities 等（注：vector_collections 与 community_detection 为早期命名，实际对应实体嵌入直接存储于 memories.embedding 列，社区发现使用 entity_communities 表）。注册表逻辑结构（九类根键/路径/值类型/写入权限定义）。 |
