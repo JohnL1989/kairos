@@ -57,7 +57,8 @@ kairos logs --follow                # 实时追踪（轻量模式）
 | 模式 | 备份命令 | 恢复命令 |
 |:----|:---------|:---------|
 | 轻量模式 | `kairos db backup`（默认路径 `~/.kairos/backups/`） | 复制备份文件至 `~/.kairos/kairos.db` |
-| 标准模式 | `pg_dump -h localhost -U kairos kairos > backup.sql` | `psql -h localhost -U kairos kairos < backup.sql` |
+| 标准模式（Docker） | `docker exec kairos-db pg_dump -U kairos kairos > backup.sql` | `cat backup.sql | docker exec -i kairos-db psql -U kairos kairos` |
+| 标准模式（本地） | `pg_dump -h localhost -U kairos kairos > backup.sql` | `psql -h localhost -U kairos kairos < backup.sql` |
 
 ### 2.2 配置备份
 

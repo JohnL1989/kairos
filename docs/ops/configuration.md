@@ -30,7 +30,9 @@ status: draft
 | `KAIROS_VIRTUAL_CALIBRATION_CONFIDENCE_CAP` | 0.3 | 虚拟校准信号的置信度上限（架构定义：预设上限 0.3 且不可用于修宪） |
 | `KAIROS_VIRTUAL_CALIBRATION_TIMEOUT` | 900 | 外部校准端口静默超过此时长（秒）后生成虚拟校准信号 |
 | `KAIROS_VIRTUAL_CALIBRATION_SIMILARITY_THRESHOLD` | 0.7 | 虚拟校准与见证锚定比对的相似度阈值 |
-| `KAIROS_VIRTUAL_CALIBRATION_CONFLICT_THRESHOLD` | 3 次 | 连续冲突次数超过此值触发拟真校准失稳告警 |
+| `KAIROS_VIRTUAL_CALIBRATION_CONFLICT_THRESHOLD` | 3 次 | 连续冲突次数超过此值触发拟真校准失稳告警（对应 observability 校准中断警告） |
+| `KAIROS_CALIBRATION_DEGRADE_THRESHOLD` | 6 周期 | 距上次校准超过此周期数触发降级告警（对应 observability 校准中断严重。1 周期 = KAIROS_SCHEDULER_INTERVAL 默认 300s） |
+| `KAIROS_SAFETY_HIBERNATION_COOLDOWN` | 30 周期 | 安全休眠态自动恢复前的冷却周期数（对应 observability degradation_mode=3） |
 
 ### §2 元认知层
 
@@ -223,4 +225,4 @@ status: draft
 
 | 版本 | 日期 | 变更 |
 |:----|:----|:-----|
-| v1.0.0 | 2026-07-18 | Kairos 配置参数参考。§1:4项，§2:9项，§3:9项，§4:24项，§5:7项，§6:2项，§7:9项（含SSRF+WAL），§8.1:5项，§8.3:11项，§8.4:1项，§8.5:1项，§9:9项，§10:4项 = 96 项参数（内含 2 项重复定义的 KAIROS_SANDBOX_CONFIDENCE_INTEGRATION_THRESHOLD，在 §3 与 §5 各统计一次）。含运行时动态调整规则与不变量。 |
+| v1.0.0 | 2026-07-18 | Kairos 配置参数参考。§1:4项，§2:9项，§3:9项，§4:24项，§5:7项，§6:2项，§7:9项（含SSRF+WAL），§8.1:5项，§8.3:11项，§8.4:1项，§8.5:1项，§9:9项，§10:2项，§10:4项 = 96 项参数（内含 2 项重复定义的 KAIROS_SANDBOX_CONFIDENCE_INTEGRATION_THRESHOLD，在 §3 与 §5 各统计一次）。含运行时动态调整规则与不变量。 |

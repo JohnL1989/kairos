@@ -89,6 +89,8 @@ status: draft
 | 错误码（ERR-XXX-NNN） | `references/error-reference.md` | ERR-XXX-NNN |
 | 债务编号（D-001~D-311） | `governance/debt-collection.md` | D-三位数 |
 | 风险编号（R-001~R-NNN） | `governance/risks.md` | R-三位数 |
+| 张力编号（T-XXX） | `governance/risks.md` | T-三位数 |
+| 里程碑编号（M-XXX） | `governance/risks.md` | M-三位数 |
 
 **禁止**：同一名称出现在两处不同定义的文档中。若必须引用，加注 `（见 §X）` 指向唯一事实源。
 
