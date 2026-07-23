@@ -43,7 +43,7 @@ status: draft
 | 组件 | 选型 | 版本 | 说明 |
 |:----|:-----|:----|:-----|
 | 文本嵌入模型 | text-embedding-3-small | — | 1536 维，API 调用 |
-| 默认嵌入模型（轻量模式） | BGE-M3 | — | 本地轻量嵌入，1024 维；标准模式默认为 text-embedding-3-small（1536 维） |
+| 默认嵌入模型（轻量模式） | BGE-M3 | — | 本地轻量嵌入，原生 1024 维（通过线性投影上采样至 1536 维输出，与 DDL 的 VECTOR(1536) 兼容）；标准模式默认为 text-embedding-3-small（1536 维） |
 | LLM 接口协议 | OpenAI API 兼容 | — | Provider 可切换 |
 | 嵌入缓存 | LRU 缓存 | — | 减少重复调用 |
 

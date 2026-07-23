@@ -31,10 +31,16 @@ status: draft
 | `version` | INTEGER | DEFAULT 1 | 版本号，更新时递增 |
 | `content` | TEXT | NOT NULL | 记忆内容 |
 | `content_hash` | TEXT | NOT NULL | SHA-256(content) |
-| `embedding` | VECTOR(1536) | — | 语义向量。标准模式 1536 维（text-embedding-3-small）；轻量模式 1024 维（BGE-M3），DDL 以 1536 为准，轻量模式创建时降维 |
+| `embedding` | VECTOR(1536) | — | 语义向量。标准模式 1536 维（text-embedding-3-small）；轻量模式 1536 维（BGE-M3，原生 1024 维线性投影至 1536），DDL 以 1536 为准 |
 | `memory_types` | JSONB | NOT NULL | JSON 数组：["episodic", "narrative", "semantic", "procedural"] 可组合，一条记忆可同时属于多类型 |
 | `contract` | TEXT | NOT NULL, DEFAULT 'ondemand' | 契约类型：permanent / ondemand / environmental / temporary（临时契约写回 LTM 带 TTL，到期自动清除） |
-| `hall` | TEXT | DEFAULT 'processing' | 知识加工区：processing / validation / canonical |
+|| `hall` | TEXT | DEFAULT 'processing' | 知识加工区：processing / validation / canonical |
+|| `solution_branch_id` | UUID | — | 所属解决方案分支 ID（同一记忆的多种语境化表征） |
+|| `distill_level` | INTEGER | DEFAULT 0, [0,4] | 蒸馏层级：0=碎片 / 1=会话 / 2=日总结 / 3=体系 / 4=元规则 |
+|| `extinction_status` | TEXT | DEFAULT 'active' | 知识灭绝状态：active / extinct（已灭绝）/ fossilized（已化石化） |
+|| `extinct_at` | TIMESTAMPTZ | — | 灭绝时间（extinction_status=extinct 时设置） |
+|| `extinct_reason` | TEXT | — | 灭绝触发事件描述（外部环境变更记录） |
+|| `lma_urn` | TEXT | — | 逻辑记忆地址 URN（MTL 二层映射的永久逻辑地址，格式：urn:kair os:lma:<uuid>），首次写入时分配，物理迁移不变 |
 | `sync_version` | INTEGER | DEFAULT 0 | 端云同步本地版本号 |
 | `provenance` | TEXT | NOT NULL | 来源：external_calibration / internal_inference / user_input / system_generated / exploration |
 | `status` | TEXT | NOT NULL, DEFAULT 'active' | active / stale / archived / suppressed / superseded。`suppressed` 为 `archived` 子态（被抑制路径不可检索，数据仍存在） |
@@ -367,7 +373,7 @@ status: draft
 | `name` | TEXT | NOT NULL | 实体名称 |
 | `type` | TEXT | DEFAULT 'concept' | project / people / concept / tool |
 | `description` | TEXT | — | 实体描述 |
-| `embedding` | VECTOR(1536) | — | 语义向量。标准模式 1536 维（text-embedding-3-small）；轻量模式 1024 维（BGE-M3），DDL 以 1536 为准，轻量模式创建时降维 |
+| `embedding` | VECTOR(1536) | — | 语义向量。标准模式 1536 维（text-embedding-3-small）；轻量模式 1536 维（BGE-M3，原生 1024 维线性投影至 1536），DDL 以 1536 为准 |
 | `metadata` | JSONB | — | 扩展元数据 |
 | `created_at` | TIMESTAMPTZ | DEFAULT now() | |
 | UNIQUE(user_id, name) | | | |
@@ -394,7 +400,7 @@ status: draft
 | `chunk_index` | INTEGER | NOT NULL | 块序号 |
 | `content` | TEXT | NOT NULL | 块内容 |
 | `text_hash` | TEXT | — | SHA256(content)，用于差分同步比较 |
-| `embedding` | VECTOR(1536) | — | 语义向量。标准模式 1536 维（text-embedding-3-small）；轻量模式 1024 维（BGE-M3），DDL 以 1536 为准，轻量模式创建时降维 |
+| `embedding` | VECTOR(1536) | — | 语义向量。标准模式 1536 维（text-embedding-3-small）；轻量模式 1536 维（BGE-M3，原生 1024 维线性投影至 1536），DDL 以 1536 为准 |
 | `created_at` | TIMESTAMPTZ | DEFAULT now() | |
 | UNIQUE(memory_id, chunk_index) | | | |
 
@@ -505,8 +511,54 @@ status: draft
 
 ---
 
+## 八、解决方案谱系与知识灭绝
+
+### solution_branches（解决方案分支表）
+
+| 列名 | 类型 | 约束 | 说明 |
+|:----|:----|:----|:-----|
+| `id` | UUID | PK | 分支全局唯一 ID |
+| `root_memory_id` | UUID | FK → memories(id) | 所属原始记忆 ID |
+| `branch_name` | TEXT | NOT NULL | 分支名称（如 concise / detailed / step_by_step） |
+| `context_signature` | TEXT | — | 触发此分支的上下文特征（哈希或摘要） |
+| `usage_count` | INTEGER | DEFAULT 0 | 分支被检索次数 |
+| `last_used_at` | TIMESTAMPTZ | — | 分支最后使用时间 |
+| `status` | TEXT | DEFAULT 'active' | active / dormant（休眠）/ merged（已合并） |
+| `merged_into` | UUID | — | 合并目标分支 ID |
+| `created_at` | TIMESTAMPTZ | NOT NULL | |
+
+**约束**：UNIQUE(root_memory_id, branch_name)
+
+### extinction_fossils（知识化石表）
+
+| 列名 | 类型 | 约束 | 说明 |
+|:----|:----|:----|:-----|
+| `id` | UUID | PK | |
+| `original_memory_id` | UUID | FK → memories(id) | 原记忆 ID（保留关联） |
+| `content_hash` | TEXT | NOT NULL | 原始内容的 SHA-256 哈希（替代原文） |
+| `path` | TEXT | NOT NULL | 原路径（保留用于拓扑恢复） |
+| `extinct_at` | TIMESTAMPTZ | NOT NULL | 灭绝时间 |
+| `extinct_reason` | TEXT | NOT NULL | 灭绝原因（外部环境变更描述） |
+| `restore_condition` | TEXT | — | 恢复条件描述（如「pgvector 版本 >= 0.7.0」） |
+| `related_fossil_ids` | UUID[] | — | 关联化石 ID 列表（同一灭绝事件链） |
+
+## 九、注册表结构
+
+注册表不是 SQL 表，而是由编译器维护的树形键值对空间。其逻辑结构如下：
+
+| 根键 | 路径 | 值类型 | 写入权限 | 说明 |
+|:----|:----|:------|:--------|:-----|
+| HKLA | identity/agent_name | TEXT | 初始化 | Agent 显示名称 |
+| HKLA | identity/agent_id | UUID | 初始化 | Agent 全局唯一 ID |
+| HKLA | soul/core_tone | ENUM | 宪法修订端口 | 核心语气（professional/concise/friendly） |
+| HKCU | profile/name | TEXT | 编译器 | 当前用户名称 |
+| HKCU | preferences/code_style | TEXT | 编译器 | 代码风格偏好 |
+| HKLM | hardware/cpu/cores | INTEGER | 系统 | CPU 核心数 |
+| HKLM | network/status | ENUM | 系统 | 网络状态（online/offline/restricted） |
+| HKCS | current_task/id | UUID | 编译器 | 当前任务 ID |
+| HKCS | current_task/phase | TEXT | 编译器 | 当前任务阶段 |
 ## 版本记录
 
-| 版本 | 日期 | 变更 |
+| 版本 | 日期 | 说明 |
 |:----|:----|:-----|
-| v1.0.0 | 2026-07-20 | 初始数据模型设计。29 张表 + 索引定义。 |
+| v1.0.0 | 2026-07-23 | 数据模型首版定稿。核心记忆表 29+ 字段（含 hall 知识加工区标识、calibration_confidence 校准置信度、VAD 情感三维、encoding_context 编码情境）。扩展字段：solution_branch_id（谱系分支）、distill_level（蒸馏层级 0-4）、extinction_status（灭绝状态）、lma_urn（MTL 逻辑地址）。双副本分离：witness_anchor 见证锚定表（含叙事自洽度/校准历史）与 usage_weight 使用权重表（含五级负载系数）。新增表：solution_branches 谱系分支表、extinction_fossils 知识化石表、memory_relations 关系索引表、vector_collections 向量集合表、community_detection 社区发现表。注册表逻辑结构（九类根键/路径/值类型/写入权限定义）。

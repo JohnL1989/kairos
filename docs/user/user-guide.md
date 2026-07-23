@@ -38,16 +38,15 @@ kairos init --db ~/.kairos/kairos.db
 
 ### 1.2 首次部署（Key 引导流程）
 
-S-01 要求无有效 Key 拒绝启动。首次部署时通过 `kairos init --init-key` 预注入 Key，打破「先有 Key 才能启动」的循环：
+S-01 要求无有效 Key 拒绝启动。首次部署时需先生成密钥，打破「先有 Key 才能启动」的循环：
 
 ```bash
-# 1. 初始化数据库和配置（生成密钥文件）
-kairos init --db ~/.kairos/kairos.db --init-key
+# 1. 初始化密钥（生成全部四个密钥并写入环境文件）
+kairos init --init-key
 
-# 2. 查看生成的 Key
-kairos config show KAIROS_API_KEY
-
-# 3. 正常启动（Key 已从配置文件加载）
+# 2. 初始化数据库
+kairos init --db ~/.kairos/kairos.db
+```
 kairos serve --port 8010
 ```
 

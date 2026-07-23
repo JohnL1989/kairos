@@ -18,7 +18,7 @@ status: draft
 
 > **定位**：开发者从零开始搭建 Kairos 开发环境。
 >
-> **⚠ 草稿完善声明**：以下所有命令为架构设计阶段的目标示例。项目当前处于草稿完善阶段期（见 changelog），无运行代码。命令格式和参数将在代码启动后最终确认。
+> **⚠ 草稿完善声明**：以下所有命令为架构设计阶段的目标示例。项目当前处于草稿完善阶段期（见 changelog），CLI 尚未构建（当前代码入口为 `python amber/main.py`）。命令格式和参数将在代码启动后最终确认。
 
 ---
 
@@ -54,12 +54,17 @@ pre-commit install
 
 ```bash
 # 轻量模式（推荐开发使用）
+
+# 1. 初始化密钥（自动生成全部四个密钥并写入环境文件）
+kairos init --init-key
+
+# 2. 初始化数据库（密钥已就绪，自动加载）
 kairos init --db sqlite:///data/kairos-dev.db
 
 # 标准模式（需要 Docker PostgreSQL）
 docker run -d --name kairos-pg -p 5432:5432 \
   -e POSTGRES_PASSWORD=kairos pgvector/pgvector:pg15
-kairos init --db postgresql://postgres:kairos@localhost:5432/kairos
+kairos init --db postgresql://postgres:***@localhost:5432/kairos
 ```
 
 ## 四、运行测试
