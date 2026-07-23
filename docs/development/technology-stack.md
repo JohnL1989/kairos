@@ -34,7 +34,7 @@ status: draft
 | 主数据库（标准模式） | PostgreSQL | ≥ 15 | 生产级关系数据库 |
 | 向量扩展（标准模式） | pgvector | ≥ 0.5 | 向量相似度搜索 |
 | 主数据库（轻量模式） | SQLite | ≥ 3.40 | 内置零配置 |
-| 向量扩展（轻量模式） | sqlite-vec | ≥ 0.1 | SQLite 向量搜索 |
+| 向量扩展（轻量模式） | sqlite-vec | ≥ 0.1 | SQLite 向量搜索。嵌入维度统一为 1536（标准模式 text-embedding-3-small；轻量模式 BGE-M3 配置 `output_dim=1536`），DDL 以 1536 为准 |
 | **连接池（标准模式）** | asyncpg + 内建连接池 | — | asyncpg 自带高效连接池；外部连接池仅在连接数 >> CPU 核数时介入；轻量模式 SQLite 无连接池 |
 | 连接池（轻量模式） | aiosqlite | — | SQLite 异步访问 |
 

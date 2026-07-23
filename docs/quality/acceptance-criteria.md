@@ -91,7 +91,7 @@ status: draft
 
 | 检查项 | 目标 |
 |:------|:----|
-| 安全红线 S-01~S-17 | 17/17 单元测试通过 |
+| 安全红线 S-01~S-19 | 19/19 单元测试通过 |
 | 审计链 HMAC 完整性 | 连续审计日志的 HMAC 链可验证 |
 | API Key 认证 | read/write/admin 三级鉴权正确 |
 
@@ -104,7 +104,7 @@ status: draft
 | 检索延迟（语义） | P50 ≤ 100ms, P95 ≤ 300ms | benchmark-plan 3.2 检索延迟测试 |
 | 写入吞吐 | ≥ 100 ops/s | benchmark-plan 3.3 吞吐测试 |
 | 检索吞吐 | ≥ 500 ops/s | benchmark-plan 3.3 吞吐测试 |
-| 安全红线 | S-01~S-17 全部单元测试通过 | test-strategy 2.2 安全红线验收表 |
+| 安全红线 | S-01~S-19 全部单元测试通过 | test-strategy 2.2 安全红线验收表 |
 
 ### 文档检查
 

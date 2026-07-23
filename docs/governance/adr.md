@@ -8,7 +8,7 @@ tags:
   - adr
 created: 2026-07-18
 updated: 2026-07-21
-status: draft
+status: v1.0.0
 ---
 
 # Kairos 架构决策记录

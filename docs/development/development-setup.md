@@ -14,7 +14,9 @@ status: draft
 
 # Kairos 开发环境搭建
 
-> **定位**：本地开发环境搭建步骤。deployment.md 面向运行环境，本文面向开发环境。
+> **状态声明**：本文描述的命令（`git clone` → `uv pip install -e ".[dev]"` → `kairos init` → `kairos serve`）为**设计目标**。当前代码（`amber/`）为先行实验性实现，无 pyproject.toml，依赖通过 `pip install -r amber/requirements.txt` 安装。实际入口为 `python amber/main.py`（FastAPI）。本文待 CLI 构建后重写。
+
+> **定位**：开发者从零开始搭建 Kairos 开发环境。
 >
 > **⚠ 草稿完善声明**：以下所有命令为架构设计阶段的目标示例。项目当前处于草稿完善阶段期（见 changelog），无运行代码。命令格式和参数将在代码启动后最终确认。
 

@@ -14,6 +14,8 @@ status: draft
 
 # Kairos 用户指南
 
+> **状态声明**：本文描述的 CLI 命令（`kairos init`、`kairos serve` 等）为**设计目标**。当前代码（`amber/`）为先行实验性实现，使用 FastAPI + asyncpg。CLI 工具尚未构建。本文档作为完整的操作规格，待 CLI 就绪后逐条可执行化。
+
 > **定位**：面向 Agent 开发者的操作文档。deployment 解决「怎么装」，本文解决「怎么用」。`kairos suppress` 为 v1.0 功能。
 >
 > **⚠ 草稿完善声明**：以下所有命令与 SDK 调用（`pip install kairos`、`from kairos import KairosClient` 等）为设计示例，当前无构建产物、无可执行命令、无 Python SDK。全部 CLI 命令（`kairos write`、`kairos search` 等）为虚构——当前文档处于设计冻结阶段，代码尚未启动。具体命令语法在代码实现后可能变化。读者应关注接口语义而非命令文本。
@@ -31,7 +33,7 @@ kairos init --db postgresql://localhost:5432/kairos
 
 # 轻量模式（SQLite，开箱即用）
 pip install kairos
-kairos init --db sqlite:///data/kairos.db
+kairos init --db ~/.kairos/kairos.db
 ```
 
 ### 1.2 首次部署（Key 引导流程）
@@ -40,7 +42,7 @@ S-01 要求无有效 Key 拒绝启动。首次部署时通过 `kairos init --ini
 
 ```bash
 # 1. 初始化数据库和配置（生成密钥文件）
-kairos init --db sqlite:///data/kairos.db --init-key
+kairos init --db ~/.kairos/kairos.db --init-key
 
 # 2. 查看生成的 Key
 kairos config show KAIROS_API_KEY
@@ -196,7 +198,7 @@ KAIROS_SEED_PATH=~/.kairos/seeds/   # 可选。未设置则使用内置默认种
 | 单条内容上限 | 64 KB | 分割为多条关联记忆 |
 | 路径深度 | ≤ 10 层 | 超深层路径拒绝（返回 400），缩短路径后重试 |
 | 单次检索返回条数 | ≤ 100 | 分页（offset/limit） |
-| 并发写入 | ≤ 100 ops/s（建议单客户端上限） | 队列缓冲。系统级硬上限 500 ops/s（熔断），单客户端建议 ≤100 ops/s 以避免触发。能力目标 ≥100 ops/s（见 NFR 规格） |
+| 并发写入 | ≤ 60/min（≈1 ops/s，单客户端令牌桶限流） | 队列缓冲。系统级硬上限 500 ops/s（熔断），系统容量目标 ≥100 ops/s（多客户端并行）。详见 ops/configuration.md §7 |
 | 单 API Key 分级 | 三级权限预置 | 多 Key 轮换 |
 | 外部校准中断持续 | 超过配置阈值（DEGRADATION_PERIOD）周期进入安全休眠 | 恢复校准信号自动退出 |
 

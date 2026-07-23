@@ -25,7 +25,7 @@ status: draft
 
 | 操作 | 映射端点 | 工具 | 安全红线 | 契约支持 | P6 合规 |
 |:-----|:---------|:-----|:---------|:---------|:--------|
-| 按路径写入 | POST /v1/memories | kairos_store_memory | S-03（长度）/S-09（注入）/S-15（来源） | permanent/ondemand/environmental/temporary | 条件激活（P6 受控例外） |
+| 按路径写入 | POST /v1/memories | memories_write | S-03（长度）/S-09（注入）/S-15（来源） | permanent/ondemand/environmental/temporary | 条件激活（P6 受控例外） |
 | 批量写入 | POST /v1/memories/batch | — | S-03/S-09 | 逐条独立 | ✅ |
 | 三区写入 | POST /v1/memories + hall | — | S-03/S-09/S-17（结构反例） | 默认 ondemand | ✅ |
 | 实体自动提取 | 写入时自动触发 | kairos_extract_entities | S-15 | — | ✅ |
@@ -39,14 +39,14 @@ status: draft
 
 | 操作 | 映射端点 | 工具 | 安全红线 | 说明 |
 |:-----|:---------|:-----|:---------|:-----|
-| 语义检索 | POST /v1/memories/search | kairos_search_memories | S-02（限流） | 5D 混合排序（语义+BM25+时序+信任+热度） |
+| 语义检索 | POST /v1/memories/search | memories_search | S-02（限流） | 5D 混合排序（语义+BM25+时序+信任+热度） |
 | 文本检索 | GET /v1/memories?q={query} | — | S-02 | 关键词全文检索（对应 requirements-baseline R-02） |
 | 路径检索 | GET /v1/path | kairos_tree | S-02 | 确定性前缀匹配 |
 | 路径空间浏览 | GET /v1/path/tree | kairos_tree | S-02 | 树状浏览 |
-| 实体图谱检索 | POST /v1/graph/search | kairos_search_graph | S-02 | 递归 CTE 多跳 |
+| 实体图谱检索 | POST /v1/graph/search | graph_search | S-02 | 递归 CTE 多跳 |
 | 时间序检索 | GET /v1/memories?sort=created_at | — | S-02 | 纯时间轴，与热度解耦 |
 | 分块检索 | 写入自动分块，检索时关联 | — | — | 200-600 字重叠窗口 |
-| 会话列表 | GET /v1/sessions | kairos_search_sessions | S-02 | |
+| 会话列表 | GET /v1/sessions | sessions_list | S-02 | |
 | 会话消息 | GET /v1/sessions/{id}/messages | — | S-02 | 游标分页 |
 | 知识演化链 | GET /v1/evolution/{id} | — | — | replaces/enriches/confirms/challenges |
 | 聚合健康报告 | GET /v1/health/detail | — | — | 按 type/state 聚合 + flags |
@@ -64,7 +64,7 @@ status: draft
 | 记忆更新 | PATCH /v1/memories/{id} | — | S-15 | 版本插入，修改历史可审计 |
 | 软删除 | DELETE /v1/memories/{id} | kairos_delete_memory | S-16（定向遗忘留痕）/S-17（结构反例豁免） | 依契约分级：permanent 拒绝/常驻按需软删/临时硬删 |
 | 定向遗忘 | POST /v1/memories/{id}/suppress | — | S-16 | 抑制检索，保留数据 |
-| 标记过期 | POST /v1/memories/{id}/expire | — | — | 设 TTL，到期自动归档。**注：** expire/lock/merge/path-suppress 为 planned 端点，当前 api-spec 中尚未正式定义，v1.0 实现时补充。 |
+| 标记过期 | POST /v1/memories/{id}/expire | — | — | 设 TTL，到期自动归档（已定义于 api-spec §1.3） |
 | 锁定 | POST /v1/memories/{id}/lock | — | — | 保护不被修改 |
 | 合并 | POST /v1/memories/merge | kairos_merge | S-14 | 语义合并，保留见证锚定 |
 | 路径抑制 | POST /v1/path/suppress | — | S-16/S-17 | 路径级检索抑制 |
@@ -98,8 +98,8 @@ status: draft
 | 阶段 | 操作数 | 说明 |
 |:-----|:------:|:------|
 | ENC | 7 | 创建/摄入 |
-| RET | 14 | 检索/查询/报告 |
-| STR | 29 | 更新/治理/运维/自动 |
-| **总计** | **50** | |
+| RET | 15 | 检索/查询/报告 |
+| STR | 31 | 更新/治理/运维/自动 |
+| **总计** | **53** | |
 
-> **对应关系**：本目录的 50 项操作与 feature-list.md 的 80 项功能之间存在多对多映射——一项功能可对应多种调用方式（API + Tool + CLI），一项操作也可服务于多项功能。操作目录回答"系统能执行什么指令"，功能清单回答"系统对外提供什么能力"。
+> **对应关系**：本目录的 53 项操作与 feature-list.md 的 80 项功能之间存在多对多映射——一项功能可对应多种调用方式（API + Tool + CLI），一项操作也可服务于多项功能。操作目录回答"系统能执行什么指令"，功能清单回答"系统对外提供什么能力"。

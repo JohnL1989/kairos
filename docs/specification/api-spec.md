@@ -83,6 +83,24 @@ status: draft
 
 **GET /v1/memories/{id}**
 
+**POST /v1/memories/search** — 五维混合检索（语义 + 路径 + 情境 + 时间 + 关系）
+
+```json
+{
+  "query": "搜索内容",
+  "mode": "hybrid",
+  "weights": {"semantic": 0.4, "path": 0.3, "context": 0.15, "temporal": 0.1, "relational": 0.05},
+  "limit": 10,
+  "filters": {"contract": "permanent", "path_prefix": "kairos://projects/"}
+}
+```
+
+**响应** `200`：标准检索结果列表（同 GET），加 `explanation` 字段说明各维度贡献。
+
+**GET /v1/memories/heat-top?limit=10** — 热度最高记忆（heat_score 降序）
+
+**响应** `200`：`{"data": [...], "total": N}`
+
 **响应** `200 OK`：
 ```json
 {
@@ -108,6 +126,34 @@ status: draft
 ```
 
 **响应** `200 OK`：返回更新后的记忆对象（含新版本号）
+
+**POST /v1/memories/{id}/feedback** — 可信度反馈
+
+```json
+{"feedback": "helpful|unhelpful|incorrect", "reason": "可选说明"}
+```
+**响应** `200`
+
+**POST /v1/memories/{id}/lock** — 锁定保护（禁止修改/删除）
+
+```json
+{"reason": "合规保留", "duration_seconds": 2592000}
+```
+**响应** `200`
+
+**POST /v1/memories/{id}/expire** — 标记过期（设 TTL，到期自动归档）
+
+```json
+{"ttl_seconds": 86400}
+```
+**响应** `200`
+
+**POST /v1/memories/merge** — 语义合并（保留见证锚定，受 S-14 约束）
+
+```json
+{"source_ids": ["uuid1", "uuid2"], "strategy": "semantic_overlay"}
+```
+**响应** `200`：返回合并后新的记忆对象
 
 ### 1.4 记忆导出/删除/定向遗忘
 
@@ -137,6 +183,13 @@ status: draft
 **GET /v1/path?path=kairos://users/{id}/** — 路径下记忆列表
 
 **GET /v1/path/tree?path=kairos://users/** — 路径空间树状浏览
+
+**POST /v1/path/suppress** — 路径级检索抑制（S-16/S-17）
+
+```json
+{"path_prefix": "kairos://_system/obsolete/", "reason": "compliance"}
+```
+**响应** `200`
 
 ### 1.6 校准与治理
 
@@ -182,7 +235,12 @@ status: draft
 **GET /v1/config** — 查看配置（A-02）
 **PATCH /v1/config** — 修改运行时配置（A-02）
 
-**GET /v1/audit-log** — 审计日志查询（CAL-05）
+**GET /v1/memories/stats** — 记忆库报告（总量/按类型/按状态/增长率）
+```json
+{"total": 1500, "by_type": {"semantic": 300, "episodic": 200, "procedural": 400, "narrative": 600}, "by_state": {"active": 1200, "stale": 200, "archived": 80, "superseded": 20}, "growth_7d": {"semantic": 15, "episodic": 8}}
+```
+
+**GET /v1/audit-log** — 审计日志查询（CAL-05）。以下参数为查询字符串参数：
 ```json
 {
   "start_time": "ISO8601",
@@ -192,7 +250,7 @@ status: draft
 }
 ```
 
-**GET /v1/falsification** — 证伪信号查询（CAL-06）
+**GET /v1/falsification** — 证伪信号查询（CAL-06）。以下参数为查询字符串参数：
 ```json
 {
   "detector": "coupling | vad_independence | system_aggregation",
@@ -212,9 +270,6 @@ status: draft
 ```
 
 **响应** `201 Created`：
-```json
-{"id": "webhook-uuid", "status": "active"}
-```
 ```json
 {"id": "webhook-uuid", "status": "active"}
 ```
@@ -303,6 +358,19 @@ status: draft
 ```
 
 ### Tool: memories_list_recent
+
+### Tool: memories_merge
+
+```json
+{
+  "name": "memories_merge",
+  "description": "语义合并多条记忆（保留见证锚定，受 S-14 约束）",
+  "parameters": {
+    "source_ids": {"type": "array", "items": {"type": "string", "format": "uuid"}, "description": "待合并的记忆 ID 列表"},
+    "strategy": {"type": "string", "enum": ["semantic_overlay", "chronological_append"], "description": "合并策略"}
+  }
+}
+```
 
 ```json
 {
@@ -497,7 +565,7 @@ status: draft
   "query": "pgvector",
   "user_id": "default",
   "limit": 10,
-  "relation_type": "mentions"
+  "relation_type": "causal"
 }
 ```
 
@@ -519,7 +587,7 @@ status: draft
 
 **响应** `200`：`{"last_light_at": "...", "last_deep_at": "...", "total_merged": 42, "total_extracted_entities": 156}`
 
-### 6.5 Reflect API（按需深度分析）
+### 6.4 Reflect API（按需深度分析）
 
 **POST /v1/reflect** — 对现有记忆执行按需深度分析
 
@@ -550,7 +618,7 @@ status: draft
 
 **参数**：`depth` — `standard`（默认，快速分析）/ `deep`（更彻底分析，耗时更长）
 
-### 6.6 健康报告与聚合统计
+### 6.5 健康报告与聚合统计
 
 **GET /v1/health/detail** — 聚合健康报告
 
@@ -561,10 +629,10 @@ status: draft
 {
   "total_memories": 1500,
   "by_type": {"semantic": 300, "episodic": 200, "procedural": 400, "narrative": 600},
-  "by_state": {"active": 1200, "stale": 200, "archived": 80, "superseded": 20},
+  "by_state": {"active": 1200, "stale": 200, "archived": 80, "suppressed": 30, "superseded": 20},
   "growth_7d": {"semantic": 15, "episodic": 8},
   "flags": {"needs_verification": 5, "contradiction": 2, "p6_deviation": true},
-  "rl_weights": {"relevance": 0.42, "recency": 0.18, "frequency": 0.15, "explicit_feedback": 0.14, "trust_score": 0.11},
+  "rl_weights": {"relevance": 0.42, "recency": 0.18, "frequency": 0.15, "user_feedback": 0.14, "trust_score": 0.11},
   "maintenance": {"last_light": "ISO8601", "last_deep": "ISO8601"}
 }
 ```
@@ -575,7 +643,7 @@ status: draft
 
 **响应** `200`：`{"knowledge_id": "...", "chain": [{"source_id": "...", "target_id": "...", "relation_type": "replaces", "confidence": 0.85}]}`
 
-### 6.7 Playbook API
+### 6.6 Playbook API
 
 **POST /v1/playbooks** — 创建 Playbook candidate
 
@@ -619,7 +687,7 @@ status: draft
 
 **响应** `200`：`{"id": "pb_abc123", "outcome": "success", "status": "promoted", "confidence": 0.65}`
 
-### 6.8 Recall Funnel API
+### 6.7 Recall Funnel API
 
 **GET /v1/search/explain** — 检索附带 recall funnel trace
 
@@ -639,26 +707,26 @@ status: draft
 }
 ```
 
-### 6.9 MCP Bridge 工具映射
+### 6.8 MCP Bridge 工具映射
 
-**GET /v1/search/explain
+**GET /v1/search/explain**
 
 MCP Bridge 不通过 REST API 暴露，而是通过独立的 MCP 服务器进程注册到 Hermes Agent。技术规格见 `src/access/mcp/bridge.py`。工具清单见架构文档 §7.3。
 
 | 工具 | 功能 | 等价 REST 操作（内部路由映射，部分非独立公开端点） |
 |:----|:-----|:--------------|
 | `kairos_store_memory` | 存储记忆 | POST /v1/memories |
-| `kairos_search_memories` | 五维混合检索 | POST /v1/memories/search ⚠（路由内部） |
-| `kairos_get_hot_memories` | 热度最高记忆 | GET /v1/memories/heat-top ⚠（路由内部） |
+| `kairos_search_memories` | 五维混合检索 | POST /v1/memories/search （定义见 §一） |
+| `kairos_get_hot_memories` | 热度最高记忆 | GET /v1/memories/heat-top （定义见 §一） |
 | `kairos_search_graph` | 图谱检索 | POST /v1/graph/search |
 | `kairos_extract_entities` | 实体提取 | POST /v1/entities/extract |
-| `kairos_feedback_memory` | 可信度反馈 | POST /v1/memories/{id}/feedback ⚠（路由内部） |
+| `kairos_feedback_memory` | 可信度反馈 | POST /v1/memories/{id}/feedback （定义见 §一） |
 | `kairos_calibrate` | 校准信号 | POST /v1/calibrate |
-| `kairos_get_stats` | 记忆库报告 | GET /v1/memories/stats ⚠（路由内部） |
+| `kairos_get_stats` | 记忆库报告 | GET /v1/memories/stats （定义见 §一） |
 | `kairos_search_sessions` | 会话搜索 | GET /v1/sessions |
 | `kairos_tree` | 路径浏览 | GET /v1/path/tree |
 
-### 6.10 知识加工区 API
+### 6.9 知识加工区 API
 
 **POST /v1/halls/promote** — 将记忆从加工区推进到验证区或正式库
 
@@ -693,7 +761,7 @@ MCP Bridge 不通过 REST API 暴露，而是通过独立的 MCP 服务器进程
 
 **Query**：`?user_id=default&limit=20`
 
-### 6.11 端云同步 API
+### 6.10 端云同步 API
 
 **POST /v1/sync/push** — 推送本地增量修改至服务端
 
@@ -770,4 +838,4 @@ MCP Bridge 不通过 REST API 暴露，而是通过独立的 MCP 服务器进程
 
 | 版本 | 日期 | 变更 |
 |:----|:----|:-----|
-| v1.0.0 | 2026-07-20 | 初始接口规格。REST API 20+ 端点（含批量导入/导出/宪法管理/降级切换/审计/证伪/调度器/种子/升华触发/升华进度）+ 4 个 Agent Tool + 27 个 CLI 命令 + 消息格式 + 错误码。 |
+| v1.0.0 | 2026-07-20 | 初始接口规格。REST API 20+ 端点（含批量导入/导出/宪法管理/降级切换/审计/证伪/调度器/种子/升华触发/升华进度）+ 4 个 Agent Tool + 24 个 CLI 命令 + 消息格式 + 错误码。 |

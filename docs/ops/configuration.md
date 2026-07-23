@@ -27,7 +27,8 @@ status: draft
 | 参数 | 默认值 | 说明 |
 |:-----|:-------|:-----|
 | `KAIROS_EXPLANATION_EXHAUSTION_ALERT_THRESHOLD` | 3 次 | 解释枯竭告警连续触发此次数后申请推理悬挂 |
-| `KAIROS_VIRTUAL_CALIBRATION_CONFIDENCE_CAP` | 0.6 | 虚拟校准信号的置信度上限 |
+| `KAIROS_VIRTUAL_CALIBRATION_CONFIDENCE_CAP` | 0.3 | 虚拟校准信号的置信度上限（架构定义：预设上限 0.3 且不可用于修宪） |
+| `KAIROS_VIRTUAL_CALIBRATION_TIMEOUT` | 900 | 外部校准端口静默超过此时长（秒）后生成虚拟校准信号 |
 | `KAIROS_VIRTUAL_CALIBRATION_SIMILARITY_THRESHOLD` | 0.7 | 虚拟校准与见证锚定比对的相似度阈值 |
 | `KAIROS_VIRTUAL_CALIBRATION_CONFLICT_THRESHOLD` | 3 次 | 连续冲突次数超过此值触发拟真校准失稳告警 |
 
@@ -123,28 +124,6 @@ status: draft
 | `KAIROS_WAL_ARCHIVE_RETENTION_DAYS` | 7 | WAL 归档保留天数 |
 
 
-### §9 RL 权重优化器参数
-
-| 参数 | 默认值 | 说明 |
-|:-----|:-------|:-----|
-| `KAIROS_RL_LEARNING_RATE` | 0.07 | RL 学习率 |
-| `KAIROS_RL_DECAY_FACTOR` | 0.97 | EMA 衰减因子 |
-| `KAIROS_RL_MAX_BUFFER_SIZE` | 50 | 反馈缓冲上限 |
-| `KAIROS_RL_WEIGHT_RELEVANCE` | 0.4 | RL 相关性权重初始值 |
-| `KAIROS_RL_WEIGHT_RECENCY` | 0.2 | RL 新鲜度权重初始值 |
-| `KAIROS_RL_WEIGHT_FREQUENCY` | 0.15 | RL 频率权重初始值 |
-| `KAIROS_RL_WEIGHT_USER_FEEDBACK` | 0.15 | RL 用户反馈权重初始值 |
-| `KAIROS_RL_WEIGHT_TRUST_SCORE` | 0.10 | RL 可信度权重初始值 |
-
-### §10 遗忘与检索参数
-
-| 参数 | 默认值 | 说明 |
-|:-----|:-------|:-----|
-| `KAIROS_FORGETTING_HALF_LIFE` | 69 | 遗忘半衰期（天） |
-| `KAIROS_FRESHNESS_ACTIVE_THRESHOLD` | 0.3 | 活跃记忆 freshness 下限 |
-| `KAIROS_FRESHNESS_STALE_THRESHOLD` | 0.1 | 归档记忆 freshness 下限 |
-| `KAIROS_DOMAIN_KEYWORDS_PATH` | `~/.kairos/domain_keywords.yaml` | 领域知识库路径 |
-
 ### §8 质量属性
 
 （本节参数见 §8.1 表）
@@ -199,6 +178,29 @@ status: draft
 
 ---
 
+
+### §9 RL 权重优化器参数
+
+| 参数 | 默认值 | 说明 |
+|:-----|:-------|:-----|
+| `KAIROS_RL_LEARNING_RATE` | 0.07 | RL 学习率 |
+| `KAIROS_RL_DECAY_FACTOR` | 0.97 | EMA 衰减因子 |
+| `KAIROS_RL_MAX_BUFFER_SIZE` | 50 | 反馈缓冲上限 |
+| `KAIROS_RL_WEIGHT_RELEVANCE` | 0.4 | RL 相关性权重初始值 |
+| `KAIROS_RL_WEIGHT_RECENCY` | 0.2 | RL 新鲜度权重初始值 |
+| `KAIROS_RL_WEIGHT_FREQUENCY` | 0.15 | RL 频率权重初始值 |
+| `KAIROS_RL_WEIGHT_USER_FEEDBACK` | 0.15 | RL 用户反馈权重初始值 |
+| `KAIROS_RL_WEIGHT_TRUST_SCORE` | 0.10 | RL 可信度权重初始值 |
+
+### §10 遗忘与检索参数
+
+| 参数 | 默认值 | 说明 |
+|:-----|:-------|:-----|
+| `KAIROS_FORGETTING_HALF_LIFE` | 69 | 遗忘半衰期（天） |
+| `KAIROS_FRESHNESS_ACTIVE_THRESHOLD` | 0.3 | 活跃记忆 freshness 下限 |
+| `KAIROS_FRESHNESS_STALE_THRESHOLD` | 0.1 | 归档记忆 freshness 下限 |
+| `KAIROS_DOMAIN_KEYWORDS_PATH` | `~/.kairos/domain_keywords.yaml` | 领域知识库路径 |
+
 ## 二、运行时动态调整规则
 
 架构中所有可配置参数支持两类调整模式：
@@ -220,4 +222,4 @@ status: draft
 
 | 版本 | 日期 | 变更 |
 |:----|:----|:-----|
-| v1.0.0 | 2026-07-18 | Kairos 配置参数参考。§1:4项，§2:9项，§3:9项，§4:24项，§5:7项，§6:2项，§7:9项（含SSRF+WAL），§8.1:5项，§8.3:11项，§8.4:1项，§8.5:1项 = 83 项参数。含运行时动态调整规则与不变量。 |
+| v1.0.0 | 2026-07-18 | Kairos 配置参数参考。§1:4项，§2:9项，§3:9项，§4:24项，§5:7项，§6:2项，§7:9项（含SSRF+WAL），§8.1:5项，§8.3:11项，§8.4:1项，§8.5:1项，§9:8项，§10:4项 = 95 项参数。含运行时动态调整规则与不变量。 |

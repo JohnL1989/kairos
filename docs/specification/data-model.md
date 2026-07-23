@@ -37,14 +37,17 @@ status: draft
 | `hall` | TEXT | DEFAULT 'processing' | 知识加工区：processing / validation / canonical |
 | `sync_version` | INTEGER | DEFAULT 0 | 端云同步本地版本号 |
 | `provenance` | TEXT | NOT NULL | 来源：external_calibration / internal_inference / user_input / system_generated / exploration |
-| `status` | TEXT | NOT NULL, DEFAULT 'active' | active / archived / suppressed / superseded |
+| `status` | TEXT | NOT NULL, DEFAULT 'active' | active / stale / archived / suppressed / superseded。`suppressed` 为 `archived` 子态（被抑制路径不可检索，数据仍存在） |
 | `is_identity` | BOOLEAN | DEFAULT FALSE | 是否为身份记忆 |
 | `is_structure` | BOOLEAN | DEFAULT FALSE | 是否为结构性记忆（认知完整性轴） |
+| `is_deleted` | BOOLEAN | DEFAULT FALSE | 软删除标记，API 软删除操作设置此标记（保留审计痕迹） |
 | `calibration_confidence` | FLOAT | DEFAULT 0.5, [0,1] | 校准置信度 |
 | `vad_v` | FLOAT | DEFAULT 0, [-1,1] | 情感效价（Valence） |
 | `vad_a` | FLOAT | DEFAULT 0, [-1,1] | 情感唤醒度（Arousal） |
 | `vad_d` | FLOAT | DEFAULT 0, [-1,1] | 情感支配度（Dominance） |
 | `decontextualization_level` | FLOAT | DEFAULT 0, [0,1] | 去语境化程度，升华时递增 |
+| `heat_score` | FLOAT | DEFAULT 1.0, [0,1] | 热度评分，用于排序权重调制 |
+| `expires_at` | TIMESTAMPTZ | — | 临时契约自动清除时间（仅 temporary 契约有效，到期后台清除） |
 | `encoding_context` | JSONB | — | 编码情境（时空上下文/任务目标/关联记忆ID） |
 | `created_at` | TIMESTAMPTZ | NOT NULL | 创建时间 |
 | `updated_at` | TIMESTAMPTZ | NOT NULL | 最后更新时间 |
@@ -181,7 +184,7 @@ status: draft
 | `details` | JSONB | — | 详细信息 |
 | `redline_id` | TEXT | — | 触发的安全红线编号（如有） |
 
-**审计链完整性**：`hmac = HMAC-SHA256(hmac_key, timestamp || operator || action || content_hash || previous_hash)`
+**审计链完整性**：`hmac = HMAC-SHA256(hmac_key, timestamp | operator | action | target_type | target_id | content_hash | details | previous_hash)`
 
 ---
 
@@ -323,7 +326,8 @@ status: draft
 
 | 列名 | 类型 | 约束 | 说明 |
 |:----|:-----|:-----|:-----|
-| `user_id` | TEXT | PK | |
+| `user_id` | TEXT | NOT NULL | 用户 ID（复合 PK 的一部分） |
+| `trait_type` | TEXT | NOT NULL, DEFAULT 'dynamic' | static（长期稳定）/ dynamic（近期活动），见上文说明。复合主键：PRIMARY KEY (user_id, trait_type) |
 | `preferences` | JSONB | DEFAULT '{}' | 用户偏好 |
 | `traits` | JSONB | DEFAULT '{}' | 用户特征 |
 | `skill_summaries` | JSONB | DEFAULT '{}' | 技能摘要 |
@@ -363,7 +367,7 @@ status: draft
 | `name` | TEXT | NOT NULL | 实体名称 |
 | `type` | TEXT | DEFAULT 'concept' | project / people / concept / tool |
 | `description` | TEXT | — | 实体描述 |
-| `embedding` | VECTOR(1024) | — | 语义向量 |
+| `embedding` | VECTOR(1536) | — | 语义向量。标准模式 1536 维（text-embedding-3-small）；轻量模式 1024 维（BGE-M3），DDL 以 1536 为准，轻量模式创建时降维 |
 | `metadata` | JSONB | — | 扩展元数据 |
 | `created_at` | TIMESTAMPTZ | DEFAULT now() | |
 | UNIQUE(user_id, name) | | | |
@@ -379,7 +383,7 @@ status: draft
 | `valid_from` | TIMESTAMPTZ | — | 关系有效起始（NULL=不绑定时间） |
 | `valid_to` | TIMESTAMPTZ | — | 关系有效截止（NULL=当前有效） |
 | `superseded_by` | BIGINT | — | 被替代关系 FK → memory_entities(id) |
-| UNIQUE(memory_id, entity_id) | | | |
+| UNIQUE(memory_id, entity_id, valid_from) | | 时序版本化：同一 memory↔entity 对可随时间有效多条关系 |
 
 ### memory_chunks（长文本分块索引）
 
@@ -390,7 +394,7 @@ status: draft
 | `chunk_index` | INTEGER | NOT NULL | 块序号 |
 | `content` | TEXT | NOT NULL | 块内容 |
 | `text_hash` | TEXT | — | SHA256(content)，用于差分同步比较 |
-| `embedding` | VECTOR(1024) | — | 块语义向量 |
+| `embedding` | VECTOR(1536) | — | 语义向量。标准模式 1536 维（text-embedding-3-small）；轻量模式 1024 维（BGE-M3），DDL 以 1536 为准，轻量模式创建时降维 |
 | `created_at` | TIMESTAMPTZ | DEFAULT now() | |
 | UNIQUE(memory_id, chunk_index) | | | |
 
@@ -414,7 +418,7 @@ status: draft
 |:----|:-----|:-----|:-----|
 | `id` | UUID | PK | |
 | `subject_type` | TEXT | NOT NULL | 'memory' |
-| `subject_id` | TEXT | NOT NULL | 关联记忆 ID |
+| `subject_id` | UUID | NOT NULL | 关联记忆 ID（FK → memories.id） |
 | `fact_key` | TEXT | NOT NULL | 归一化事实键 |
 | `truth_type` | TEXT | NOT NULL | factual / project_fact / environment_fact |
 | `validator_kind` | TEXT | DEFAULT 'none' | none / file_exists / command / http / manual |
@@ -505,4 +509,4 @@ status: draft
 
 | 版本 | 日期 | 变更 |
 |:----|:----|:-----|
-| v1.0.0 | 2026-07-20 | 初始数据模型设计。19 张表（memories / memory_relations / memory_tags / witness_anchor / usage_weight / usage_events / sublimation_queue / forgetting_queue / audit_log / config / seeds 等 11 核心 + 8 张 v1.0 新增补充表）+ 索引定义。 |
+| v1.0.0 | 2026-07-20 | 初始数据模型设计。29 张表 + 索引定义。 |

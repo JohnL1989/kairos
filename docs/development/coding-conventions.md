@@ -34,7 +34,7 @@ status: draft
 | 路径键 | kebab-case（路径段） | `kairos://users/default/core/` |
 | 数据库列 | snake_case | `usage_count`, `is_identity` |
 | JSON 字段 | snake_case | 同 Python |
-| 异步函数 | `async def` + `_async` 后缀（仅在函数名不足以表达异步性时） | `async def retrieve_memories(...)` |
+| 异步函数 | `async def` + `_async` 后缀（仅在函数名不足以表达异步性时） | `async def retrieve_memories_async(...)` |
 | 协程变量 | `task` 前缀 | `task_sublimation`, `task_forgetting` |
 | 异步上下文管理器 | `async with` | `async with db.session():` |
 | Litestar handler | `@post`/`@get` + `async def` | 见 api-spec.md 示例 |

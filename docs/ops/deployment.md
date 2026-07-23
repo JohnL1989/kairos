@@ -122,7 +122,7 @@ services:
   kairos:
     image: kairos/kairos:latest
     ports:
-      - "8010:8010"
+      - "127.0.0.1:8010:8010"
     environment:
       - KAIROS_DB_DSN=postgresql://kairos:${KAIROS_DB_PASSWORD}@db:5432/kairos
       - KAIROS_API_KEY=${KAIROS_API_KEY}
@@ -168,7 +168,7 @@ kairos db backup      # 手动备份
 
 ## 七、日志与监控
 
-Kairos 输出结构化 JSON 日志到 stdout：
+Kairos 输出结构化 JSON 日志到 stdout（容器部署模式）；本地运行时同时写入 `~/.kairos/logs/`（按日轮转，保留 30 天）。日志格式见 observability.md §二。
 
 ```json
 {"level":"info","timestamp":"2026-07-18T10:00:00Z","component":"scheduler","message":"sublimation stage 2 completed","events_processed":42}

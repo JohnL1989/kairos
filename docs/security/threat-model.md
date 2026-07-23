@@ -13,7 +13,7 @@ status: draft
 
 # Kairos 威胁模型与安全对抗
 
-> **文档定位：** 系统威胁模型分析。安全红线（S-01~S-17）见 `docs/foundation/architecture-v1.0.0.md` §8。本文件为 STRIDE 映射的完整展开。
+> **文档定位：** 系统威胁模型分析。安全红线（S-01~S-19）见 `docs/foundation/architecture-v1.0.0.md` §8。本文件为 STRIDE 映射的完整展开。
 
 ---
 
@@ -78,6 +78,8 @@ status: draft
 | S-15 | 记忆缺少来源分类，无法区分外部校准与内部推演 | 写入路径 | 每条记忆必须记录来源类型，来源缺失返回 422 |
 | S-16 | 定向遗忘未留痕视为未执行 | 宪法解释层授权流程 | 所有定向遗忘操作写入审计日志，标记 `directed_forgetting` 或 `identity_demotion` |
 | S-17 | 结构性反例免于遗忘 | 遗忘调度器 / 压缩管道 | P6 闸门守护——反例类记忆不受遗忘调度器评估，结构反例在压缩/升华管道中强制保留 |
+| S-18 | Hard Delete 安全门 | 存储层/向量存储 | 硬删除须先确认对应 vector 已清理完毕，才允许 SQLite/PostgreSQL 数据删除。软删除不受此限。强制执行 fail-closed：vector 清理失败则事务回滚，数据保留 |
+| S-19 | 哈希净化（Hash Purification） | 遗忘调度器 | 定向遗忘的记忆用 SHA-256 替代原文（化石节点），保留拓扑关系但不可恢复原文。GDPR 擦除请求对应 S-19 执行 |
 
 ## 五、审计完整性
 

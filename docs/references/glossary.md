@@ -102,7 +102,7 @@ status: draft
 
 | 术语 | 英文 | 定义 | 来源 |
 |:----|:-----|:-----|:-----|
-| 安全红线 | Security Redlines | S-01~S-17 共 17 条不可降级的硬约束，违反即拒绝+审计日志记录 | 架构 §8 |
+| 安全红线 | Security Redlines | S-01~S-19 共 19 条不可降级的硬约束，违反即拒绝+审计日志记录 | 架构 §8 |
 | 语境自指禁令（S-14） | Contextual Self-Reference Prohibition | 内部信号不得作为见证锚定真实性的证据来源——使用权重不可无声改写见证锚定 | 架构 §8 |
 | 审计链 | Audit Chain | 双字段链式审计日志——`(a)` 明文链 `prev_content_hash`（供按内容追踪），`(b)` HMAC-SHA256 完整性签名 `hmac(n) = HMAC(key, timestamp+operator+action+content_hash+prev_hmac)`。同时支持精确定位篡改记录和整体完整性校验 | 架构 §10.10 |
 | 证伪响应 | Falsification Response | 体系聚合可证伪性的架构承载——耦合计监测器 + VAD 独立性测试器 + 聚合审计器 | 架构 §10.10 |

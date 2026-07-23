@@ -11,10 +11,11 @@ tags:
 created: 2026-07-21
 updated: 2026-07-21
 status: draft
-> **说明**：本文为施工图纸（设计稿），组件状态见下方索引表。待首迭代完成核心 3 组件后晋升为 v1.0.0。当前 status=draft，非发布版本。
 ---
 
-# Kairos 详细设计
+> **说明**：本文为施工图纸（设计稿），组件状态见下方索引表。待首迭代完成核心 3 组件后晋升为 v1.0.0。当前 status=draft，非发布版本。
+
+# Kairos
 
 > **定位**：architecture-v1.0.0.md 是「鸟瞰图」，本文是「施工图纸」——每个核心组件的内部结构、状态机、核心算法伪代码、接口定义。代码启动后第一个迭代内完成核心 3 组件（WM 管理器 / 存储引擎 / 遗忘引擎），校准调度器与事件总线同为 P0 但归入第二迭代，其余随开发补齐。
 
@@ -184,30 +185,31 @@ class StorageBackend(ABC):
 
 ### 遗忘得分算法（伪代码）
 
-```
+```python
 FORGETTING_SCORE(memory):
     # 基础分：二维遗忘曲面
-    decontext = memory.age_days / DECONTEXT_HALF_LIFE
-    age_factor = SIGMOID(memory.age_days / AGE_DECAY_CONSTANT)
+    decontext = memory.decontextualization_level  # [0,1]，来自 data-model
+    age_days = (NOW - memory.created_at).days     # 运行时计算
+    age_factor = SIGMOID(age_days / AGE_DECAY_CONSTANT)  # AGE_DECAY_CONSTANT 默认 30 天，由 KAIROS_AGE_DECAY_CONSTANT 配置
     base_score = decontext * age_factor
     
     # 使用频率调制
-    recent_use = memory.usage_count_last_30d
-    frequency_mod = 1.0 / (1.0 + LOG(1 + recent_use))
+    recent_use = COUNT(usage_events WHERE memory_id = memory.id AND timestamp > NOW - 30d)  # 运行时计算
+    frequency_mod = 1.0 / (1.0 + LN(1 + recent_use))  # LN = 自然对数
     
     # 契约类型系数
     contract_mod = {
         "permanent": 0.0,     # 常驻：不遗忘
         "ondemand": 1.0,      # 按需：标准
-        "environmental": 1.5, # 环境：更易遗忘
-        "temporary": 2.0,     # 临时：最快遗忘
+        "environmental": 1.5, # 环境：更易遗忘（clamp 后上限 1.0）
+        "temporary": 2.0,     # 临时：最快遗忘（clamp 后上限 1.0）
     }[memory.contract]
     
     # 身份与结构豁免
     if memory.is_identity or memory.is_structure:
         return 0.0
     
-    score = base_score * frequency_mod * contract_mod
+    score = base_score * frequency_mod * min(contract_mod, 1.0)  # contract_mod >1 截断至 1.0
     return CLAMP(score, 0.0, 1.0)
 ```
 
@@ -303,6 +305,11 @@ CALIBRATION_LOOP:
             WEIGHTED_MERGE(signal, CONFIDENCE(signal))
         else:
             # 冲突：进入冲突消解协议
+            # RESOLVE_CONFLICT 协议：当外部校准信号与见证锚定主副本存在实质性冲突（cosine 距离 ≥ 0.35）时——
+            # 1. 将冲突校准信号注入模拟隔离区做反事实推演
+            # 2. 推演结果与主副本对比，确认冲突范围（局部属性冲突 vs 核心主张冲突）
+            # 3. 局部属性冲突：标记冲突属性，保留主副本其余部分不变
+            # 4. 核心主张冲突：悬挂主副本更新，等待下一次校准信号确认（连续两次冲突则触发宪法解释层仲裁）
             RESOLVE_CONFLICT(signal)
         
         # 审计记录
@@ -363,6 +370,8 @@ LAYER_DISTILL(session_id):
 
 蒸馏置信度低于 KAIROS_CAPTURE_CONFIDENCE_FLOOR（默认 0.6）的产物标记为待审，
 不自动进入上层。关系检测在 L1 阶段执行。
+
+```
 REASONING_LOOP(context):
     # 1. 向预测器查询预激活集
     pre_activated = PREDICTOR.QUERY(context)
@@ -392,13 +401,14 @@ REASONING_LOOP(context):
   "source": "storage_layer | strategy_layer | wm_layer | metacognition_layer | sovereignty_plane",
   "priority": 0,
   "payload": {},
-  "timestamp": "ISO 8601"
+  "timestamp": "ISO 8601",
+  "ttl_seconds": 300
 }
 ```
 
 ### 事件类型表
 
-> 事件定义以 `api-spec.md` §四为权威来源，完整枚举见 `architecture-v1.0.0.md §10.10`。本文仅引用，不新增事件类型。
+> 事件定义以 `architecture-v1.0.0.md §10.10` 为唯一权威来源。本文仅引用，不新增事件类型。
 
 | event_type | 发送者 | 接收者 | 说明 |
 |-----------|:-------|:-------|:-----|

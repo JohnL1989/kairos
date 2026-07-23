@@ -14,6 +14,8 @@ status: draft
 
 # Kairos 快速入门
 
+> **状态声明**：本文描述的 CLI 命令（`kairos init`、`kairos serve` 等）为**设计目标**，当前代码（`amber/` 目录）为先行实验性实现（FastAPI + asyncpg + pgvector）。CLI 工具尚未构建。若需直接使用现有代码，见 `amber/README.md`。
+
 > **定位**：5 分钟跑通 Kairos 最小闭环。无需 PostgreSQL，轻量模式（SQLite）开箱即用。
 >
 > **⚠ 草稿完善声明**：以下所有命令（`pip install kairos`、`kairos serve` 等）为目标示例。当前草稿完善阶段期无构建产物或可执行包，命令将在代码启动后交付。
@@ -24,10 +26,8 @@ status: draft
 
 - Python ≥ 3.11
 - pip 或 uv
-- 设置 `KAIROS_SALT` 环境变量（S-05 要求无 Salt 拒绝启动）
-- 设置 `KAIROS_API_KEY` 环境变量（S-01 要求无 Key 拒绝启动）。Key 由 `kairos init --init-key` 在第二步生成——前置条件阶段无需手动设置，`init --init-key` 会自动生成并写入环境文件
-- 设置 `KAIROS_SECRET_KEY` 环境变量（S-07 敏感字段加密）
-- 设置 `KAIROS_AUDIT_HMAC_KEY` 环境变量（审计链签名密钥）
+- 设置 `KAIROS_SALT` 环境变量（S-05 要求无 Salt 拒绝启动）。由 `kairos init --init-key` 自动生成，前置条件阶段无需手动设置
+- `KAIROS_API_KEY`、`KAIROS_SECRET_KEY`、`KAIROS_AUDIT_HMAC_KEY` 同样由 `init --init-key` 自动生成——前置条件阶段无需手动设置任何密钥
 
 ## 第一步：安装
 
@@ -35,16 +35,15 @@ status: draft
 pip install kairos
 ```
 
-## 第二步：生成 API Key
+## 第二步：初始化并生成密钥
 
 ```bash
-# 生成 API Key
-kairos admin key generate    # 未来命令，当前草稿完善阶段期无构建产物
+# 初始化数据库并自动生成全部密钥
+kairos init --init-key
 
-# 输出类似：
-# API Key: sk-xxxxxxxxxxxx
-# 请立即将 Key 设置为环境变量：
-export KAIROS_API_KEY=sk-xxxxxxxxxxxx
+# init --init-key 自动生成 KAIROS_API_KEY / KAIROS_SALT / KAIROS_SECRET_KEY / KAIROS_AUDIT_HMAC_KEY
+# 并写入环境文件（默认 ~/.kairos/.env）
+# 启动时自动读取，无需手动 export
 ```
 
 > S-01 要求无有效 API Key 时系统拒绝所有请求。Key 生成后请妥善保管。
@@ -69,7 +68,8 @@ kairos serve --port 8010
 ```bash
 kairos write kairos://playground/ \
   --content "Kairos 快速入门测试记忆" \
-  --contract ondemand
+  --contract ondemand \
+  --source user_input
 ```
 
 输出应类似：

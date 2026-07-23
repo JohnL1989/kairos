@@ -72,7 +72,7 @@ cp ~/.kairos/.env ~/.kairos/.env.bak
 恢复后执行 `kairos health --full` 确认以下项正常：
 - 数据库连接
 - 审计链 HMAC 完整性
-- 安全红线检查（S-01~S-17）
+- 安全红线检查（S-01~S-19）
 
 ---
 

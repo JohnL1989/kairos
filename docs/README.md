@@ -13,7 +13,7 @@ status: draft
 
 # Kairos 文档索引
 
-> **当前状态**：**文档草稿阶段，无运行代码**。本文档库尚无可运行的 Kairos 系统。feature-list 列出的 **99 项能力（43 核心 + 56 扩展；traceability-map 追溯其中 43 项与认知声明的映射）** 处于架构就绪状态，代码未启动。
+> **当前状态**：**文档草稿阶段，无运行代码**。本文档库尚无可运行的 Kairos 系统。feature-list 列出的 **101 项能力（43 核心 + 58 扩展；traceability-map 追溯其中 43 项与认知声明的映射）** 处于架构就绪状态，代码未启动。
 
 > **快速入口：** [系统架构](foundation/architecture-v1.0.0.md) · [认知基础](foundation/cognitive-foundation.md) · [待实现债务清单](governance/debt-collection.md)
 
@@ -32,8 +32,8 @@ status: draft
 | 路径 | 内容 |
 |:-----|:-----|
 | [`specification/claim-implementation-matrix.md`](specification/claim-implementation-matrix.md) | **声明-承载对齐矩阵** — 从认知基础提取的 37 项架构承载声明对应表 |
-| [`specification/feature-list.md`](specification/feature-list.md) | **功能清单** — 12 类 **99 项**对外能力枚举 |
-| [`specification/data-model.md`](specification/data-model.md) | **数据模型** — 11 张核心表 Schema + 索引 |
+| [`specification/feature-list.md`](specification/feature-list.md) | **功能清单** — 12 类 **101 项**对外能力枚举 |
+| [`specification/data-model.md`](specification/data-model.md) | **数据模型** — 29 张表 Schema + 索引 |
 | [`specification/api-spec.md`](specification/api-spec.md) | **接口规格** — REST API / Agent Tool / CLI / 事件总线 |
 | [`specification/implementation-map.md`](specification/implementation-map.md) | **实现映射** — 40+ 组件路径映射，从架构到代码模块 |
 | [`specification/detailed-design.md`](specification/detailed-design.md) | **详细设计** — 核心组件状态机 + 算法伪代码 |
