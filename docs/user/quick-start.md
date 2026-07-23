@@ -42,7 +42,7 @@ pip install kairos
 kairos init --init-key
 
 # init --init-key 自动生成 KAIROS_API_KEY / KAIROS_SALT / KAIROS_SECRET_KEY / KAIROS_AUDIT_HMAC_KEY
-# 并写入环境文件（默认 ~/.kairos/.env）
+# 并写入环境文件（默认 ~/.kairos/.env——密钥文件路径，非 secrets.yaml）
 # 启动时自动读取，无需手动 export
 ```
 

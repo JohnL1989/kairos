@@ -50,7 +50,7 @@ kairos init --db ~/.kairos/kairos.db
 kairos serve --port 8010
 ```
 
-`--init-key` 生成以下密钥并写入 `~/.kairos/secrets.yaml`：
+`--init-key` 生成以下密钥并写入 `~/.kairos/.env`（与 quick-start 一致）：
 - `KAIROS_API_KEY` — API 鉴权
 - `KAIROS_SECRET_KEY` — 数据加密
 - `KAIROS_AUDIT_HMAC_KEY` — 审计链 HMAC

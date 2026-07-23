@@ -343,6 +343,7 @@ status: draft
 | `confidence` | FLOAT | DEFAULT 0.5 | 画像置信度 |
 | `version` | INTEGER | DEFAULT 1 | 画像版本号 |
 | `updated_at` | TIMESTAMPTZ | NOT NULL | |
+| `rl_weights` | JSONB | — | RL 权重六维配置：键为 `relevance`/`recency`/`frequency`/`explicit_feedback`/`entity_boost`/`trust_score`，各维权重和为 1（Bounded Simplex 约束），默认值见 rl-weight-spec.md。v1.0 entity_boost 默认 0.05 不主动参与排序，v1.1+ 激活完整加权 |
 
 ## 七、扩展表
 
@@ -564,4 +565,4 @@ status: draft
 
 | 版本 | 日期 | 说明 |
 |:----|:----|:-----|
-| v1.0.0 | 2026-07-23 | 数据模型设计定稿（文档仍保持 draft 状态——无运行代码验证）。核心记忆表 30+ 字段（新增 content_summary 摘要列；含 hall 知识加工区标识、calibration_confidence 校准置信度、VAD 情感三维、encoding_context 编码情境）。扩展字段：solution_branch_id（谱系分支）、distill_level（蒸馏层级 0-4）、extinction_status（灭绝状态）、lma_urn（MTL 逻辑地址）。双副本分离：witness_anchor 见证锚定表（含叙事自洽度/校准历史）与 usage_weight 使用权重表（含五级负载系数）。新增表：solution_branches、extinction_fossils、memory_relations、entity_communities 等（注：vector_collections 与 community_detection 为早期命名，实际对应实体嵌入直接存储于 memories.embedding 列，社区发现使用 entity_communities 表）。注册表逻辑结构（九类根键/路径/值类型/写入权限定义）。v1.0 统一 1536 维单向量，128/2048 为 v1.1+ 目标（见架构 §3.9）。 |
+| v1.0.0 | 2026-07-23 | 数据模型设计定稿（文档仍保持 draft 状态——无运行代码验证）。核心记忆表 30+ 字段（新增 content_summary 摘要列；含 hall 知识加工区标识、calibration_confidence 校准置信度、VAD 情感三维、encoding_context 编码情境）。扩展字段：solution_branch_id（谱系分支）、distill_level（蒸馏层级 0-4）、extinction_status（灭绝状态）、lma_urn（MTL 逻辑地址）。双副本分离：witness_anchor 见证锚定表（含叙事自洽度/校准历史）与 usage_weight 使用权重表（含五级负载系数）。新增表：solution_branches、extinction_fossils、memory_relations、entity_communities 等（注：vector_collections 与 community_detection 为早期命名，实际对应实体嵌入直接存储于 memories.embedding 列，社区发现使用 entity_communities 表）。注册表逻辑结构（九类根键/路径/值类型/写入权限定义）。v1.0 统一 1536 维单向量，128/2048 为 v1.1+ 目标（见架构 §3.9）。user_profiles 新增 rl_weights 列，承载六维 RL 权重配置（见 rl-weight-spec.md）。 |

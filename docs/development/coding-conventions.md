@@ -91,7 +91,7 @@ kairos/
 |:----|:-----|:-----|
 | `level` | debug/info/warn/error | `info` |
 | `timestamp` | ISO 8601 | `2026-07-20T10:00:00Z` |
-| `component` | 来源组件 | `forgetting_scheduler` |
+| `component` | 来源组件（对应 observability.md 的 `logger` 字段，格式：`kairos.<layer>.<component>`） | `kairos.storage.forgetting` |
 | `message` | 可读描述 | `forgetting score threshold reached` |
 | `memory_id` | 关联记忆 ID | `uuid` |
 | `event_id` | 关联事件 ID | `uuid` |

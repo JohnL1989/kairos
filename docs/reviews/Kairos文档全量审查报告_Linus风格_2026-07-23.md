@@ -4,6 +4,10 @@
 > 审查范围：D:\projects\kairos\docs 下全部 50 份文档（排除 reviews/）
 > 审查方式：逐字通读 + 逐文档批评 + 跨文档一致性实证核查（所有关键矛盾均经原文 grep 复核）
 > 态度声明：不讲客套。好就是好，烂就是烂。
+>
+> **⚠️ 复核勘误（2026-07-23 二次原文核验）**：本报告初稿由审查代理生成，二次核验发现两处指控不成立，已据实修正并透明标注：
+> 1. **RL 权重维度**：初稿称 rl-weight-spec/api-spec/configuration「5 维 user_feedback 缺 entity_boost」。经复核，四处文档（architecture §10.14、rl-weight-spec、api-spec:638、configuration §9）**均为 6 维 `explicit_feedback`+`entity_boost`，完全一致**；唯一错误是 `changelog.md:35` 虚假声称已改名 `user_feedback`（从未执行）。错在 changelog，不在下游。
+> 2. **data-model「吹嘘不存在的表」**：初稿称版本记录造假。经复核，data-model 行 567 已声明 vector_collections/community_detection 为早期命名并对应实际结构——文档已自辩，非造假。真实缺口是架构引用的 `memory_versions`/`world_model_rules`/`proactive_topic` 三表 data-model 未定义（见正文修正条目）。
 
 ---
 
@@ -67,7 +71,7 @@
 - **评分：62/100**。一句话：能用的接口草稿，但连自己有多少端点都不知道。
 
 ### 5. data-model.md
-- **版本记录吹嘘不存在的表**："含 vector_collections 向量集合表、community_detection 社区发现表"——正文从未定义这两张表（只有 entity_communities）。这是在变更记录里造假。
+- **版本记录的早期命名已自辩**：版本记录（行 567）写"含 vector_collections、community_detection"，但紧接着明确声明"vector_collections 与 community_detection 为早期命名，实际对应实体嵌入直接存储于 memories.embedding 列，社区发现使用 entity_communities 表"——并非造假，文档已自我澄清。真正该记一笔的是：**架构引用的 `memory_versions`、`world_model_rules`、`proactive_topic` 三张表，data-model 从头到尾未定义**（grep 全库无匹配），这是实打实的 schema 悬空，比命名问题严重。
 - **第 36-62 行表格用 `||` 起头，Markdown 渲染直接塌**。
 - **价值维度枚举全文缺失**：整个数据模型没有一处枚举价值维度的具体取值——这是本系统的核心概念。
 - **日期矛盾**：frontmatter `updated: 2026-07-20` vs 版本记录 2026-07-23。

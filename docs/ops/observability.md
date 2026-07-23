@@ -49,7 +49,7 @@ status: draft
     "api": {"status": "ok", "latency_ms": 2},
     "db": {"status": "ok", "pool_connections": 5, "pool_available": 3},
     "scheduler": {"status": "running", "last_tick": "2026-07-20T10:00:00Z"},
-    "embedding": {"status": "ok", "model": "text-embedding-3-small"},
+    "embedding": {"status": "ok", "model": "text-embedding-3-small（标准模式）/ BGE-M3（轻量模式，线性投影至 1536 维）"},
     "sublimation": {"status": "idle", "queue_length": 0},
     "calibration": {"status": "active", "last_arrival": "2026-07-20T09:55:00Z", "mode": "normal"}
   },
