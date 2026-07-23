@@ -36,7 +36,7 @@ status: draft
 
 | 术语 | 英文 | 定义 | 来源 |
 |:----|:-----|:-----|:-----|
-| **五轴度量空间（v1.0 承载四轴，第五轴可及性以代理实现，完整度量 v1.1）** | Five-axis Metric Space (v1.0 carries four axes, fifth accessibility axis via proxy, full metric v1.1) | 使用价值/见证价值/时间/认知完整性四轴正交的度量空间，辅以潜伏势能。完整规范模型为五轴（含可及性轴），v1.0 以降维形式承载 | 认知基础 §1.1 |
+|| **五轴度量空间**（认知模型） | Five-axis Metric Space (cognitive model) | 认知基础定义的完整价值模型——使用、见证、时间、认知完整性、可及性五轴。**区别于**「五维使用价值向量」（使用价值轴的五个子维度，见 usage-load-algorithm）和「五维混合检索」（搜索排序的五个信号源：语义+BM25+时序+信任+热度，见 api-spec §一/architecture §10.14） | 认知基础 §1.1 |
 | 多重记忆 | Multiple Memory | 同一经验可同时编码为情景/叙事/语义/程序四类，四类间有因果/独立/层级/竞争关系 | 认知基础 §1.2 |
 | 潜伏势能 | Latent Potential | 零使用价值记忆的保留依据，由元认知层盲区探测触发重估 | 架构 §5.2 |
 | 升华管道 | Sublimation Pipeline | raw→item→strategy→behavior 四阶段渐进提纯，空闲驱动 | 架构 §5.2 |
@@ -104,7 +104,7 @@ status: draft
 |:----|:-----|:-----|:-----|
 | 安全红线 | Security Redlines | S-01~S-19 共 19 条不可降级的硬约束，违反即拒绝+审计日志记录 | 架构 §8 |
 | 语境自指禁令（S-14） | Contextual Self-Reference Prohibition | 内部信号不得作为见证锚定真实性的证据来源——使用权重不可无声改写见证锚定 | 架构 §8 |
-| 审计链 | Audit Chain | 双字段链式审计日志——`(a)` 明文链 `prev_content_hash`（供按内容追踪），`(b)` HMAC-SHA256 完整性签名 `hmac(n) = HMAC(key, timestamp+operator+action+content_hash+prev_hmac)`。同时支持精确定位篡改记录和整体完整性校验 | 架构 §10.10 |
+| 审计链 | Audit Chain | 双字段链式审计日志——`(a)` 明文链 `prev_content_hash`（供按内容追踪），`(b)` HMAC-SHA256 完整性签名 `hmac(n) = HMAC(key, timestamp+operator+action+details(SHA256)+content_hash+prev_hmac)`（details 含原因/reason 等可变信息，以 SHA256 摘要纳入链计算）。同时支持精确定位篡改记录和整体完整性校验 | 架构 §10.10 |
 | 证伪响应 | Falsification Response | 体系聚合可证伪性的架构承载——耦合计监测器 + VAD 独立性测试器 + 聚合审计器 | 架构 §10.10 |
 
 ---
