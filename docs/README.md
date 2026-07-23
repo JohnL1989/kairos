@@ -117,6 +117,7 @@ status: draft
 | 路径 | 内容 |
 |:-----|:-----|
 | [`reviews/architecture-audit-template.md`](reviews/Kairos架构文档审计模板_精简版.md) | **架构文档审计模板** — 独立评审提示词 |
+| [`reviews/comprehensive-audit-report.md`](reviews/Kairos文档全集_Linus风格批判_主审终稿_2026-07-22.md) | **Linus 审计主审终稿** — 第三方全量审查 |
 | [`reviews/comprehensive-audit-report.md`](reviews/Kairos文档全集_Linus风格批判_主审终稿_2026-07-22.md) | **文档全集审计报告（Linus 风格·主审终稿）** — 一致性/完整性/治理合规性 |
 | [`reviews/architecture-analysis.md`](reviews/mnemosyne-os-cross-analysis.md) | **架构方案评审** — 四维分析 + 改造措施 + 实施路线图 |
 

@@ -201,15 +201,15 @@ FORGETTING_SCORE(memory):
     contract_mod = {
         "permanent": 0.0,     # 常驻：不遗忘
         "ondemand": 1.0,      # 按需：标准
-        "environmental": 1.5, # 环境：更易遗忘（clamp 后上限 1.0）
-        "temporary": 2.0,     # 临时：最快遗忘（clamp 后上限 1.0）
+        "environmental": 1.5, # 环境：比默认易遗忘（v1.0 简化版 clamp 至 1.0，与 ondemand 无差别）
+        "temporary": 2.0,     # 临时：最快遗忘（v1.0 简化版 clamp 至 1.0，与 environmental/ondemand 无差别）
     }[memory.contract]
     
     # 身份与结构豁免
     if memory.is_identity or memory.is_structure:
         return 0.0
     
-    score = base_score * frequency_mod * min(contract_mod, 1.0)  # contract_mod >1 截断至 1.0
+    score = base_score * frequency_mod * min(contract_mod, 1.0)  # v1.0 简化：三契约遗忘速率退化为两档（permanent 0.0 / 其余均为 1.0），v1.1+ 移除 clamp 恢复四档差异
     return CLAMP(score, 0.0, 1.0)
 ```
 

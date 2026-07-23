@@ -105,7 +105,7 @@ status: draft
 
 | 架构组件 | 代码路径 | 说明 |
 |:--------|:---------|:-----|
-| REST API 路由 | `src/access/api/` | Litestar handler，约 20+ 端点 |
+| REST API 路由 | `src/access/api/` | Litestar handler（设计目标 57 个端点，详见 api-spec.md §版本记录） |
 | CLI 命令 | `src/access/cli.py` | 27 条 CLI 命令 |
 | MCP Bridge | `src/access/mcp/bridge.py` | MCP 服务器进程，10 tools（见 api-spec §6.9） |
 | Memory Provider | `src/access/provider/kairos_provider.py` | Hermes 原生记忆 Provider，6 lifecycle hooks |

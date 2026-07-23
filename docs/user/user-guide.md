@@ -46,7 +46,7 @@ kairos init --init-key
 
 # 2. 初始化数据库
 kairos init --db ~/.kairos/kairos.db
-```
+```bash
 kairos serve --port 8010
 ```
 
@@ -93,7 +93,7 @@ client = KairosClient(api_key="sk-...")
 memory = client.write(
     path="kairos://sessions/abc123/",
     content="用户偏好：暗色主题",
-    source="chat_input",         # S-15 要求来源标识
+    source="user_input",         # S-15 要求来源标识（合法枚举值见 api-spec provenance 字段）
     contract="ondemand",         # 可选：permanent / ondemand / environmental / temporary
 )
 

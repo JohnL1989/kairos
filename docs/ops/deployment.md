@@ -65,7 +65,7 @@ status: draft
 | `KAIROS_SECRET_KEY` | 是 | — | AES-256-GCM 敏感字段加密密钥 |
 | `KAIROS_AUDIT_HMAC_KEY` | 是 | — | HMAC-SHA256 审计链签名密钥 |
 
-> **密钥生成引导**：以上四个 `KAIROS_*` 密钥均可通过 `kairos init --init-key` 一次性生成并写入环境文件，无需手动逐一配置。详见 `user-guide.md` §1.2。
+> **密钥生成引导**：以上五个 `KAIROS_*` 密钥（含 KAIROS_LLM_API_KEY）均可通过 `kairos init --init-key` 一次性生成并写入环境文件，无需手动逐一配置。详见 `user-guide.md` §1.2。
 | `KAIROS_LLM_API_KEY` | 是 | — | LLM 供应商 API Key |
 | `KAIROS_LLM_ENDPOINT` | 是 | — | LLM 供应商端点 |
 | `KAIROS_ADMIN_IPS` | 生产推荐 | — | 管理端点 IP 白名单 |
@@ -78,6 +78,9 @@ status: draft
 | `KAIROS_RATE_LIMIT_READ_PER_MIN` | 否 | 120 | 读操作限流 |
 | `KAIROS_INPUT_LIMIT_CONTENT_BYTES` | 否 | 65536 | 单条内容上限（字节） |
 | `KAIROS_SSRF_ALLOWED_HOSTS` | 生产推荐 | `api.deepseek.com` | 出站 URL 白名单 |
+| `KAIROS_SSRF_IP_CHECK` | 否 | `true` | 解析 URL 后二次校验 IP，阻断内网/元数据地址 |
+| `KAIROS_SSRF_DNS_REBIND_PROTECTION` | 否 | `true` | DNS 重绑定防护（DNS 解析结果与 HTTP 请求时的 IP 不一致时拒绝） |
+| `KAIROS_INPUT_LIMIT_QUERY_CHARS` | 否 | `500` | query 字段最大字符数（漏配的安全缺口——照 configuration §7 与 threat-model §三 要求） |
 | `KAIROS_WAL_ARCHIVE_COMMAND` | 否 | `cp %p ~/.kairos/wal_archive/%f` | WAL 归档命令 |
 
 ---
