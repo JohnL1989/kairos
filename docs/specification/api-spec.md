@@ -237,7 +237,7 @@ status: draft
 
 **GET /v1/memories/stats** — 记忆库报告（总量/按类型/按状态/增长率）
 ```json
-{"total": 1500, "by_type": {"semantic": 300, "episodic": 200, "procedural": 400, "narrative": 600}, "by_state": {"active": 1200, "stale": 200, "archived": 80, "superseded": 20}, "growth_7d": {"semantic": 15, "episodic": 8}}
+{"total": 1530, "by_type": {"semantic": 300, "episodic": 200, "procedural": 400, "narrative": 600}, "by_state": {"active": 1200, "stale": 200, "archived": 80, "suppressed": 30, "superseded": 20}, "growth_7d": {"semantic": 15, "episodic": 8}}
 ```
 
 **GET /v1/audit-log** — 审计日志查询（CAL-05）。以下参数为查询字符串参数：
