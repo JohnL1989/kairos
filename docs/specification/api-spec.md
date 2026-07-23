@@ -388,7 +388,7 @@ status: draft
 
 | 命令 | 说明 | 示例 |
 |:----|:-----|:-----|
-| `kairos init` | 初始化系统（创建配置、目录和数据库） | `kairos init --db sqlite:///data/kairos.db` |
+| `kairos init` | 初始化系统（创建配置、目录和数据库） | `kairos init --db sqlite:///$HOME/.kairos/kairos.db` |
 | `kairos serve` | 启动服务 | `kairos serve --port 8010` |
 | `kairos write <path>` | 写入记忆 | `kairos write kairos://users/default/memories/ --content "..."` |
 | `kairos read <path>` | 读取记忆 | `kairos read kairos://users/default/memories/abc` |

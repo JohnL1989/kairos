@@ -137,13 +137,13 @@ FUSE(candidates_by_path):
 Access Layer → 验证门禁（高信用源豁免→跳过 raw）
   │
   ▼
-写入 raw 层（不可检索）
+写入 raw（processing）层（不可检索）
   │
   ▼
 摄取验证环 → 失败 → 丢弃
   │ 通过
   ▼
-升格为 item（可检索）
+升格为 item（可检索。对应 data-model hall=validation→canonical 两阶段推进）
   │
   ├──→ 写入见证锚定主副本（强一致）
   ├──→ 初始化使用权重影子副本（最终一致）
@@ -194,7 +194,7 @@ FORGETTING_SCORE(memory):
     base_score = decontext * age_factor
     
     # 使用频率调制
-    recent_use = COUNT(usage_events WHERE memory_id = memory.id AND timestamp > NOW - 30d)  # 运行时计算
+    recent_use = COUNT(usage_events WHERE memory_id = memory.id AND created_at > NOW - 30d)  # 运行时计算
     frequency_mod = 1.0 / (1.0 + LN(1 + recent_use))  # LN = 自然对数
     
     # 契约类型系数

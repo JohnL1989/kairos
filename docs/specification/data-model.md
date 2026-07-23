@@ -31,7 +31,7 @@ status: draft
 | `version` | INTEGER | DEFAULT 1 | 版本号，更新时递增 |
 | `content` | TEXT | NOT NULL | 记忆内容 |
 | `content_hash` | TEXT | NOT NULL | SHA-256(content) |
-| `embedding` | VECTOR(1536) | — | 语义向量。标准模式 1536 维（text-embedding-3-small）；轻量模式 1536 维（BGE-M3，原生 1024 维线性投影至 1536），DDL 以 1536 为准 |
+| `embedding` | VECTOR(1536) | —（向量检索时 NULL 记录被自动跳过） | 语义向量。标准模式 1536 维（text-embedding-3-small）；轻量模式 1536 维（BGE-M3，原生 1024 维线性投影至 1536），DDL 以 1536 为准 |
 | `memory_types` | JSONB | NOT NULL | JSON 数组：["episodic", "narrative", "semantic", "procedural"] 可组合，一条记忆可同时属于多类型 |
 | `contract` | TEXT | NOT NULL, DEFAULT 'ondemand' | 契约类型：permanent / ondemand / environmental / temporary（临时契约写回 LTM 带 TTL，到期自动清除） |
 || `hall` | TEXT | DEFAULT 'processing' | 知识加工区：processing / validation / canonical |
@@ -40,7 +40,7 @@ status: draft
 || `extinction_status` | TEXT | DEFAULT 'active' | 知识灭绝状态：active / extinct（已灭绝）/ fossilized（已化石化） |
 || `extinct_at` | TIMESTAMPTZ | — | 灭绝时间（extinction_status=extinct 时设置） |
 || `extinct_reason` | TEXT | — | 灭绝触发事件描述（外部环境变更记录） |
-|| `lma_urn` | TEXT | — | 逻辑记忆地址 URN（MTL 二层映射的永久逻辑地址，格式：urn:kair os:lma:<uuid>），首次写入时分配，物理迁移不变 |
+|| `lma_urn` | TEXT | — | 逻辑记忆地址 URN（MTL 二层映射的永久逻辑地址，格式：urn:kairos:lma:<uuid>），首次写入时分配，物理迁移不变 |
 | `sync_version` | INTEGER | DEFAULT 0 | 端云同步本地版本号 |
 | `provenance` | TEXT | NOT NULL | 来源：external_calibration / internal_inference / user_input / system_generated / exploration |
 | `status` | TEXT | NOT NULL, DEFAULT 'active' | active / stale / archived / suppressed / superseded。`suppressed` 为 `archived` 子态（被抑制路径不可检索，数据仍存在） |
@@ -57,7 +57,7 @@ status: draft
 | `encoding_context` | JSONB | — | 编码情境（时空上下文/任务目标/关联记忆ID） |
 | `created_at` | TIMESTAMPTZ | NOT NULL | 创建时间 |
 | `updated_at` | TIMESTAMPTZ | NOT NULL | 最后更新时间 |
-| `superseded_by` | UUID | REFERENCES memories(id) | 被取代的新记忆 ID（修正场景） |
+| `superseded_by` | UUID | REFERENCES memories(id) ON DELETE SET NULL | 被取代的新记忆 ID（修正场景）。注意：临时契约硬删除时该 FK 自动置 NULL |
 | `last_access_at` | TIMESTAMPTZ | — | 最后访问时间（用于遗忘曲线计算） |
 | `domain` | TEXT | DEFAULT 'general' | 领域标签（用于领域路由检索） |
 
@@ -142,6 +142,8 @@ status: draft
 | `ttl` | INTERVAL | — | 生存时间，到期自动清理 |
 
 **分区**：按 `created_at` 时间分区（月/季），过期分区自动归档或删除。
+
+**建议索引**：`(memory_id, created_at)` — 遗忘调度器的 `WHERE memory_id = X AND created_at > NOW - 30d` 查询依赖此索引
 
 ---
 
@@ -373,7 +375,7 @@ status: draft
 | `name` | TEXT | NOT NULL | 实体名称 |
 | `type` | TEXT | DEFAULT 'concept' | project / people / concept / tool |
 | `description` | TEXT | — | 实体描述 |
-| `embedding` | VECTOR(1536) | — | 语义向量。标准模式 1536 维（text-embedding-3-small）；轻量模式 1536 维（BGE-M3，原生 1024 维线性投影至 1536），DDL 以 1536 为准 |
+| `embedding` | VECTOR(1536) | —（向量检索时 NULL 记录被自动跳过） | 语义向量。标准模式 1536 维（text-embedding-3-small）；轻量模式 1536 维（BGE-M3，原生 1024 维线性投影至 1536），DDL 以 1536 为准 |
 | `metadata` | JSONB | — | 扩展元数据 |
 | `created_at` | TIMESTAMPTZ | DEFAULT now() | |
 | UNIQUE(user_id, name) | | | |
@@ -400,7 +402,7 @@ status: draft
 | `chunk_index` | INTEGER | NOT NULL | 块序号 |
 | `content` | TEXT | NOT NULL | 块内容 |
 | `text_hash` | TEXT | — | SHA256(content)，用于差分同步比较 |
-| `embedding` | VECTOR(1536) | — | 语义向量。标准模式 1536 维（text-embedding-3-small）；轻量模式 1536 维（BGE-M3，原生 1024 维线性投影至 1536），DDL 以 1536 为准 |
+| `embedding` | VECTOR(1536) | —（向量检索时 NULL 记录被自动跳过） | 语义向量。标准模式 1536 维（text-embedding-3-small）；轻量模式 1536 维（BGE-M3，原生 1024 维线性投影至 1536），DDL 以 1536 为准 |
 | `created_at` | TIMESTAMPTZ | DEFAULT now() | |
 | UNIQUE(memory_id, chunk_index) | | | |
 

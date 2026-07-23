@@ -13,7 +13,7 @@ status: draft
 
 # Kairos 威胁模型与安全对抗
 
-> **文档定位：** 系统威胁模型分析。安全红线（S-01~S-19）见 `docs/foundation/architecture-v1.0.0.md` §8。本文件为 STRIDE 映射的完整展开。
+> **文档定位：** 系统威胁模型分析。安全红线（S-01~S-19）的详细需求/实现/验证见 `docs/security/security-specification.md`。高层定义见 `docs/foundation/architecture-v1.0.0.md` §8。本文件为 STRIDE 映射的完整展开。
 
 ---
 

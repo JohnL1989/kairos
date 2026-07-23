@@ -22,7 +22,7 @@ status: draft
 
 ## §1 安全需求
 
-从 S-01~S-19 整合，每条含：需求/实现方案/验证方法。本文 S 编号与 test-strategy §2.2 / threat-model / architecture §8 保持规范一致，所有文档以此编号为准。
+从 S-01~S-19 整合，每条含：需求/实现方案/验证方法。本文 S 编号为安全规格的规范源，与 test-strategy §2.2 / threat-model / architecture §8 保持规范一致。
 
 | ID | 需求 | 适用 | 实现方案 | 验证方法 |
 |:---|:-----|:----:|:--------|:--------|

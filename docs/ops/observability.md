@@ -16,7 +16,7 @@ status: draft
 
 | **定位**：定义 Kairos 系统的指标体系、结构化日志 schema、告警规则。架构文档定义了「做什么」，本文定义「如何看见做了什么」。
 >
-> **暴露协议**：指标通过 `/metrics` 端点以 Prometheus 文本格式暴露（端口 8010/metrics）。日志通过异步 I/O 写入 `~/.kairos/logs/`，按日轮转，保留 30 天。
+> **暴露协议**：指标通过 `/metrics` 端点以 Prometheus 文本格式暴露（端口 8010/metrics）。日志通过异步 I/O 写入 `~/.kairos/logs/`（本地模式）或 stdout（容器模式），按日轮转，保留 30 天。
 
 ---
 

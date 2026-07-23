@@ -42,7 +42,7 @@ status: draft
 | [`specification/system-context.md`](specification/system-context.md) | **系统上下文** — 边界声明 + 外部依赖 |
 | [`specification/use-cases.md`](specification/use-cases.md) | **使用场景** — 8 个典型交互场景 |
 | [`specification/rl-weight-spec.md`](specification/rl-weight-spec.md) | **RL 权重优化器规格** — 五维权重 + 学习算法 |
-| [`specification/operation-catalog.md`](specification/operation-catalog.md) | **操作目录** — 50 项标准操作，按 ENC/RET/STR 三阶段组织，标注安全红线 |
+| [`specification/operation-catalog.md`](specification/operation-catalog.md) | **操作目录** — 53 项标准操作，按 ENC/RET/STR 三阶段组织，标注安全红线 |
 
 ## 开发文档（怎么上手开发）
 
@@ -65,7 +65,7 @@ status: draft
 | [`governance/social-calibration-roadmap.md`](governance/social-calibration-roadmap.md) | **社会性校准演进路线图** — v1.0→v2.0 里程碑 |
 | [`governance/cognitive-architecture-gap.md`](governance/cognitive-architecture-gap.md) | **认知-架构承诺差距表** — 12 项降维/预留/偏离追踪 |
 | [`governance/documentation-governance.md`](governance/documentation-governance.md) | **文档治理规范** — 更新联动/交叉引用/状态管理/编号注册 |
-| [`governance/release-process.md`](governance/release-process.md) | **发布流程** — 版本号/检查清单/发布步骤/许可证 |
+| [`governance/release-guide.md`](governance/release-guide.md) | **发布指南** — 版本号/检查清单/发布步骤/许可证 |
 
 ## 运维文档
 
@@ -107,7 +107,7 @@ status: draft
 |:-----|:-----|
 | [`references/glossary.md`](references/glossary.md) | **术语表** — ~52 条中英文术语对照 |
 | [`references/error-reference.md`](references/error-reference.md) | **错误参考** — 7 类 30 个错误码 |
-| [`references/traceability-map.md`](references/traceability-map.md) | **需求可追溯性映射表** — 43 能力↔37 声明↔89 追踪项（27 闭环 DC + 62 MNM + 11 待实现 D）↔12 差距交叉映射 |
+| [`references/traceability-map.md`](references/traceability-map.md) | **需求可追溯性映射表** — 43 能力↔37 声明↔100 追踪项（27 闭环 DC + 62 MNM + 11 待实现 D）↔12 差距交叉映射 |
 | [`references/usage-load-algorithm.md`](references/usage-load-algorithm.md) | **使用负载计量算法** |
 | [`references/vad-coordinate-algorithm.md`](references/vad-coordinate-algorithm.md) | **VAD 情感坐标算法** |
 | [`references/value-dimension-entropy.md`](references/value-dimension-entropy.md) | **价值维度熵值守护算法** |

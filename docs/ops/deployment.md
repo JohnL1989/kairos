@@ -56,7 +56,8 @@ status: draft
 
 | 变量 | 必填 | 默认值 | 说明 |
 |:----|:----|:-------|:-----|
-| `KAIROS_DB_DSN` | 标准模式必填；轻量模式（SQLite）自动创建 | `sqlite:///data/kairos.db`（轻量模式） | 数据库连接串 |
+| `KAIROS_DB_DSN` | 标准模式必填；轻量模式（SQLite）自动创建 | `sqlite:///$HOME/.kairos/kairos.db`（轻量模式，与 backup/restore 路径一致） | 数据库连接串 |
+| `KAIROS_LITE_MODE` | 否 | `true` | 轻量模式开关（true=SQLite/false=PostgreSQL）。设为 false 时需配置 `KAIROS_DB_DSN` |
 | `KAIROS_DB_PASSWORD` | 标准模式需 | — | PostgreSQL 密码（docker-compose 部署用，非 DSN 内部含密码时不需要） |
 | `KAIROS_API_KEY` | 是 | — | API 认证密钥 |
 | `KAIROS_SALT` | 是 | — | PBKDF2 盐值（S-05） |
@@ -120,7 +121,7 @@ curl http://localhost:8010/health  # 健康检查端点
 # docker-compose.yml
 services:
   kairos:
-    image: kairos/kairos:latest
+    image: kairos/kairos:v1.0.0    # 生产部署必须钉死版本，不使用 :latest
     ports:
       - "127.0.0.1:8010:8010"
     environment:
@@ -152,7 +153,7 @@ volumes:
 
 ## 六、数据库初始化
 
-轻量模式（SQLite）自动创建数据库和表结构。启动时自动执行迁移。
+轻量模式（SQLite）首次启动时自动创建数据库和表结构。升级/降级等 schema 变更需手动执行迁移命令（见下文）。
 
 标准模式（PostgreSQL）：
 ```bash
@@ -191,4 +192,17 @@ docker compose up -d    # 自动重建
 kairos db migrate       # 执行数据库迁移
 ```
 
-升级前建议先备份数据库。降级需使用旧镜像 + 回滚迁移。
+升级前建议先备份数据库。降级步骤：
+> **路径说明**：轻量模式运行时数据库与 backup/restore 路径统一为 `~/.kairos/kairos.db`。安全规格（security-spec §4）的默认配置目录 `~/.kairos/` 为所有数据文件的根目录，包含数据库、日志、迁移文件等。
+
+
+```bash
+# 轻量模式
+pip install kairos==<旧版本>
+kairos db migrate rollback  # 回滚数据库迁移
+
+# 标准模式
+docker compose pull kairos  # 确保拉取的是旧镜像/或通过 tag 切换
+docker compose up -d        # 使用旧镜像重建
+kairos db migrate rollback  # 回滚数据库迁移
+```
