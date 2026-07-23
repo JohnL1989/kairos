@@ -83,7 +83,7 @@ status: draft
 
 **GET /v1/memories/{id}**
 
-**POST /v1/memories/search** — 五维混合检索（语义 + 路径 + 情境 + 时间 + 关系）
+**POST /v1/memories/search** — 五维混合检索（语义 + BM25 + 时序 + 信任 + 热度）
 
 ```json
 {

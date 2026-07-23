@@ -63,7 +63,7 @@ kairos logs --follow                # 实时追踪（轻量模式）
 
 ```bash
 # 备份完整配置和密钥
-cp ~/.kairos/config.yaml ~/.kairos/config.yaml.bak
+cp ~/.kairos/.env ~/.kairos/.env.bak    # 备份环境配置（见 deployment.md §三）
 cp ~/.kairos/.env ~/.kairos/.env.bak
 ```
 
@@ -87,7 +87,7 @@ kairos db migrate       # 执行数据库迁移
 
 # 降级（需保留旧版本 wheel）
 pip install kairos==<旧版本>
-kairos db rollback      # 回滚迁移
+kairos db migrate rollback      # 回滚迁移
 ```
 
 ### 3.2 标准模式
@@ -103,7 +103,7 @@ docker compose down
 # 加载旧镜像版本（替换 Image tag 为目标版本后执行）
 docker compose pull
 docker compose up -d
-kairos db rollback
+kairos db migrate rollback
 ```
 
 升级前建议先备份数据库。
@@ -125,7 +125,7 @@ kairos db rollback
 
 | 操作 | 命令 |
 |:----|:-----|
-| 生成 | `kairos admin key generate` |
+| 生成 | `kairos init --init-key` |
 | 轮换 | `kairos admin key rotate` |
 | 吊销 | `kairos admin key revoke <key-id>` |
 

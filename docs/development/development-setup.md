@@ -63,7 +63,7 @@ kairos init --db sqlite:///data/kairos-dev.db
 
 # 标准模式（需要 Docker PostgreSQL）
 docker run -d --name kairos-pg -p 5432:5432 \
-  -e POSTGRES_PASSWORD=kairos pgvector/pgvector:pg15
+  -e POSTGRES_PASSWORD=kairos pgvector/pgvector:pg16
 kairos init --db postgresql://postgres:***@localhost:5432/kairos
 ```
 
