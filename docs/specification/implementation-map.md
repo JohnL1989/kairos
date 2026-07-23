@@ -61,7 +61,7 @@ status: draft
 
 | 架构组件 | 代码路径 | 说明 |
 |:--------|:---------|:-----|
-| 数据模型定义 | `src/storage/models.py` | 20 张表（11 核心 + 9 张 v1.0 新增，含 user_profiles）ORM 定义（memories/relations/usage 等） |
+| 数据模型定义 | `src/storage/models.py` | 31 张表（12 核心 + 19 张 v1.0 新增）ORM 定义（memories/relations/usage 等） |
 | 记忆 CRUD | `src/storage/memory_store.py` | 记忆写入/检索/更新/导出/删除 |
 | 路径空间索引 | `src/storage/path_index.py` | `kairos://` 路径前缀索引与树状查询 |
 | 向量索引 | `src/storage/vector_index.py` | pgvector/sqlite-vec 语义相似度搜索 |

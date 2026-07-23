@@ -22,7 +22,7 @@ status: draft
 ### Phase 0：止血
 
 - README L152 "代码仓库为空" → 承认 `amber/` 代码存在（main.py 734行 + API 19模块 + schema 449行）
-- 计数统一：99→101 项能力（9处），11/18→29 张表（2处），S-01~S-19 连续编号确认
+- 计数统一：99→101 项能力（9处），11/18→31 张表（2处），S-01~S-19 连续编号确认
 - 虚拟校准置信度上限统一为 0.3（L2058 0.6→0.3）
 - 参数命名统一：VIRTUAL_MERGE_THRESHOLD→VIRTUAL_CALIBRATION_SIMILARITY_THRESHOLD，VIRTUAL_FAILURE_COUNT→VIRTUAL_CALIBRATION_CONFLICT_THRESHOLD
 - SQLite 路径统一：用户文档 ~/.kairos/kairos.db，部署文档 /data/kairos.db
