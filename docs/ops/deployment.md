@@ -78,6 +78,7 @@ status: draft
 | `KAIROS_RATE_LIMIT_READ_PER_MIN` | 否 | 120 | 读操作限流 |
 | `KAIROS_INPUT_LIMIT_CONTENT_BYTES` | 否 | 65536 | 单条内容上限（字节） |
 | `KAIROS_SSRF_ALLOWED_HOSTS` | 生产推荐 | `api.deepseek.com` | 出站 URL 白名单 |
+| `KAIROS_WAL_ARCHIVE_RETENTION_DAYS` | 否 | `7` | WAL 归档保留天数（configuration §7 引用，默认 7 天）。设为 0 禁用归档 |
 | `KAIROS_SSRF_IP_CHECK` | 否 | `true` | 解析 URL 后二次校验 IP，阻断内网/元数据地址 |
 | `KAIROS_SSRF_DNS_REBIND_PROTECTION` | 否 | `true` | DNS 重绑定防护（DNS 解析结果与 HTTP 请求时的 IP 不一致时拒绝） |
 | `KAIROS_INPUT_LIMIT_QUERY_CHARS` | 否 | `500` | query 字段最大字符数（漏配的安全缺口——照 configuration §7 与 threat-model §三 要求） |
@@ -135,6 +136,7 @@ services:
       - KAIROS_SECRET_KEY=${KAIROS_SECRET_KEY}
       - KAIROS_AUDIT_HMAC_KEY=${KAIROS_AUDIT_HMAC_KEY}
       - KAIROS_LLM_API_KEY=${KAIROS_LLM_API_KEY}
+      - KAIROS_LITE_MODE=false
       - KAIROS_LLM_ENDPOINT=${KAIROS_LLM_ENDPOINT}
     volumes:
       - ~/.kairos:/root/.kairos

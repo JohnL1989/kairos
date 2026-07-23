@@ -343,7 +343,7 @@ status: draft
 | `confidence` | FLOAT | DEFAULT 0.5 | 画像置信度 |
 | `version` | INTEGER | DEFAULT 1 | 画像版本号 |
 | `updated_at` | TIMESTAMPTZ | NOT NULL | |
-| `rl_weights` | JSONB | — | RL 权重六维配置：键为 `relevance`/`recency`/`frequency`/`explicit_feedback`/`entity_boost`/`trust_score`，各维权重和为 1（Bounded Simplex 约束），默认值见 rl-weight-spec.md。v1.0 entity_boost 默认 0.05 不主动参与排序，v1.1+ 激活完整加权 |
+| `rl_weights` | JSONB | — | RL 权重六维配置：键为 `relevance`/`recency`/`frequency`/`explicit_feedback`/`entity_boost`/`trust_score`，各维独立取值，不强制和为 1（各维度独立更新，见 rl-weight-spec.md 初始化说明）。v1.0 entity_boost 默认 0.05 不主动参与排序，v1.1+ 激活完整加权 |
 
 ## 七、扩展表
 

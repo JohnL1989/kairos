@@ -103,7 +103,7 @@ status: draft
 | 检索延迟（路径前缀） | P50 ≤ 20ms, P95 ≤ 80ms | benchmark-plan 3.2 检索延迟测试 |
 | 检索延迟（语义） | P50 ≤ 100ms, P95 ≤ 300ms | benchmark-plan 3.2 检索延迟测试 |
 | 写入吞吐 | ≥ 100 ops/s | benchmark-plan 3.3 吞吐测试 |
-| 检索吞吐 | ≥ 500 ops/s | benchmark-plan 3.3 吞吐测试 |
+| 检索吞吐 | ≥ 200 ops/s（上限受单客户端读限流 120/min 约束，100 并发峰值 ≈200/s。如需更高吞吐须在基准测试中临时调高限流上限，见 configuration.md §7） | benchmark-plan 3.3 吞吐测试 |
 | 安全红线 | S-01~S-19 全部单元测试通过 | test-strategy 2.2 安全红线验收表 |
 
 ### 文档检查
