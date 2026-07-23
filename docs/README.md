@@ -106,7 +106,7 @@ status: draft
 | 路径 | 内容 |
 |:-----|:-----|
 | [`references/glossary.md`](references/glossary.md) | **术语表** — ~52 条中英文术语对照 |
-| [`references/error-reference.md`](references/error-reference.md) | **错误参考** — 7 类 30 个错误码 |
+| [`references/error-reference.md`](references/error-reference.md) | **错误参考** — 9 类 38 个错误码 |
 | [`references/traceability-map.md`](references/traceability-map.md) | **需求可追溯性映射表** — 43 能力↔37 声明↔100 追踪项（27 闭环 DC + 62 MNM + 11 待实现 D）↔12 差距交叉映射 |
 | [`references/usage-load-algorithm.md`](references/usage-load-algorithm.md) | **使用负载计量算法** |
 | [`references/vad-coordinate-algorithm.md`](references/vad-coordinate-algorithm.md) | **VAD 情感坐标算法** |

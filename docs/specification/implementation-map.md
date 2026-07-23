@@ -109,7 +109,7 @@ status: draft
 | CLI 命令 | `src/access/cli.py` | 27 条 CLI 命令 |
 | MCP Bridge | `src/access/mcp/bridge.py` | MCP 服务器进程，10 tools（见 api-spec §6.9） |
 | Memory Provider | `src/access/provider/kairos_provider.py` | Hermes 原生记忆 Provider，6 lifecycle hooks |
-| Agent Tool 定义 | `src/access/tools.py` | 4 个 Agent Tool（memories_write/memories_search/path_browse/memories_list_recent） |
+| Agent Tool 定义 | `src/access/tools.py` | 5 个 Agent Tool（memories_write/memories_search/path_browse/memories_list_recent/memories_merge） |
 | 干扰控制层 | `src/access/interference.py` | WM 负载超限时降级检索结果 |
 | 鉴权中间件 | `src/access/auth.py` | API Key（read/write/admin 三级）鉴权 |
 | 摄取验证门禁 | `src/access/ingestion.py` | 内容长度/路径格式/敏感信息/安全红线验证 |
