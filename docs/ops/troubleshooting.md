@@ -44,4 +44,4 @@ status: draft
 | **安全事件排查** | | |
 | **API Key 疑似泄露** | ① 立即吊销泄露 Key ② 生成新 Key 并更新 `KAIROS_API_KEY` ③ 检查审计日志中该 Key 在泄露时间窗口内的所有操作 | `kairos admin key rotate` |
 | **数据库文件损坏** | ① 停止服务 ② 从最近备份恢复 ③ 运行 `kairos db verify` ④ 如备份不可用，尝试 `kairos db repair` | `kairos db restore <backup_path>` |
-| **升级失败回滚** | ① 停止服务 ② 恢复旧版本二进制/镜像 ③ 执行 `kairos db rollback` 回滚数据库迁移 | 旧镜像版本 + `docker compose up -d` |
+| **升级失败回滚** | ① 停止服务 ② 恢复旧版本二进制/镜像 ③ 执行 `kairos db migrate rollback` 回滚数据库迁移 | 旧镜像版本 + `docker compose up -d` |

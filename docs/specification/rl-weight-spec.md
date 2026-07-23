@@ -26,7 +26,8 @@ status: draft
 | `relevance` | 0.30–0.50 | 0.40 | user, knowledge, research | 查询与记忆的语义相关性 |
 | `recency` | 0.15–0.25 | 0.20 | context, task_history | 记忆新鲜度 |
 | `frequency` | 0.10–0.20 | 0.15 | experience | 访问频率 |
-| `user_feedback` | 0.10–0.20 | 0.15 | user | 用户显式反馈（👍/👎） |
+| `explicit_feedback` | 0.10–0.20 | 0.15 | user | 用户显式反馈（👍/👎） |
+| `entity_boost` | 0.00–0.10 | 0.05 | knowledge, experience | 实体重要性提升（v1.0 默认 0.05，不主动参与排序；v1.1 激活完整加权） |
 | `trust_score` | 0.05–0.15 | 0.10 | knowledge, experience, research | 来源可信度 |
 
 ## 多维排序算法
@@ -40,12 +41,12 @@ status: draft
    b. 维度间的关系由 P6 全局闸门约束（见§P6合规段）
    c. 检索排序器接收五维独立信号，按字典序逐维裁决
 3. 跨维冲突（如相关性和新鲜度指向不同结果）由辞典式优先级解决：
-   relevance < recency < frequency < user_feedback < trust_score
+   relevance < recency < frequency < explicit_feedback < entity_boost < trust_score
 ```
 
 ### 初始化
 
-各维度独立初始化到目标范围中位数。不做 simplex 归一化（和≠1 是正常的——各维度独立运作）。
+各维度独立初始化到目标范围中位数。不做 simplex 归一化（和≠1 是正常的——各维度独立运作）。entity_boost 默认 0.05，仅在 v1.1+ 激活完整加权时参与排序。
 
 ### 维度权重更新
 
@@ -76,4 +77,4 @@ status: draft
 
 ## 持久化
 
-五维权重以 JSONB 存储于 `user_profiles` 表的 `rl_weights` 字段中（按 user_id/profile 隔离，重启后自动恢复）。权重维度：`{"relevance": 0.40, "recency": 0.20, "frequency": 0.15, "user_feedback": 0.15, "trust_score": 0.10}`。代码实现时需在 data-model.md user_profiles 表补充该字段定义。
+五维权重以 JSONB 存储于 `user_profiles` 表的 `rl_weights` 字段中（按 user_id/profile 隔离，重启后自动恢复）。权重维度：`{"relevance": 0.40, "recency": 0.20, "frequency": 0.15, "explicit_feedback": 0.15, "entity_boost": 0.05, "trust_score": 0.10}`。代码实现时需在 data-model.md user_profiles 表补充该字段定义。

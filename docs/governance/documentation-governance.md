@@ -87,7 +87,7 @@ status: draft
 | 社会性校准里程碑编号（SCR-XXX） | `governance/social-calibration-roadmap.md` | SCR-两位数 |
 | 测试用例编号（TC-XXX） | `quality/test-plan.md` | TC-前缀 + 两位数 |
 | 错误码（ERR-XXX-NNN） | `references/error-reference.md` | ERR-XXX-NNN |
-| 债务编号（D-001~D-211） | `governance/debt-collection.md` | D-三位数 |
+| 债务编号（D-001~D-311） | `governance/debt-collection.md` | D-三位数 |
 | 风险编号（R-001~R-NNN） | `governance/risks.md` | R-三位数 |
 
 **禁止**：同一名称出现在两处不同定义的文档中。若必须引用，加注 `（见 §X）` 指向唯一事实源。

@@ -156,7 +156,7 @@ Kairos 是一个面向 AI Agent 的记忆系统——不是传统数据库，也
 
 | 需求 ID | 设计章节 | API 端点 | 测试用例（test-plan.md） |
 |:--------|:--------|:---------|:------------------------|
-| W-01 | arch §6.3 | `POST /v1/memories` | TC-W01-001~003 |
+| W-01 | arch §7.3 | `POST /v1/memories` | TC-W01-001~003 |
 | W-02 | arch §3.1 | `contract` 参数 | TC-W02-001 |
 | R-01 | arch §4.2 | `GET /v1/path` | TC-R01-001~003 |
 | R-02 | arch §4.2 | `POST /v1/memories/search`（语义检索） | TC-R02-001~002 |

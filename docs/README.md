@@ -13,7 +13,7 @@ status: draft
 
 # Kairos 文档索引
 
-> **当前状态**：**文档草稿阶段，无运行代码**。本文档库尚无可运行的 Kairos 系统。feature-list 列出的 **101 项能力（43 核心 + 58 扩展；traceability-map 追溯其中 43 项与认知声明的映射）** 处于架构就绪状态，代码未启动。
+> **当前状态**：**文档草稿阶段，无运行代码**。本文档库尚无可运行的完整 Kairos 系统（注：`amber/` 目录下存在实验性引擎原型代码，用于概念验证，非生产实现）。feature-list 列出的 **101 项能力（43 核心 + 58 扩展；traceability-map 追溯其中 43 项与认知声明的映射）** 处于架构就绪状态，核心引擎代码未启动。
 
 > **快速入口：** [系统架构](foundation/architecture-v1.0.0.md) · [认知基础](foundation/cognitive-foundation.md) · [待实现债务清单](governance/debt-collection.md)
 
@@ -33,7 +33,7 @@ status: draft
 |:-----|:-----|
 | [`specification/claim-implementation-matrix.md`](specification/claim-implementation-matrix.md) | **声明-承载对齐矩阵** — 从认知基础提取的 37 项架构承载声明对应表 |
 | [`specification/feature-list.md`](specification/feature-list.md) | **功能清单** — 12 类 **101 项**对外能力枚举 |
-| [`specification/data-model.md`](specification/data-model.md) | **数据模型** — 29 张表 Schema + 索引 |
+| [`specification/data-model.md`](specification/data-model.md) | **数据模型** — 31 张表 Schema + 索引 |
 | [`specification/api-spec.md`](specification/api-spec.md) | **接口规格** — REST API / Agent Tool / CLI / 事件总线 |
 | [`specification/implementation-map.md`](specification/implementation-map.md) | **实现映射** — 40+ 组件路径映射，从架构到代码模块 |
 | [`specification/detailed-design.md`](specification/detailed-design.md) | **详细设计** — 核心组件状态机 + 算法伪代码 |
@@ -41,7 +41,7 @@ status: draft
 | [`specification/requirements-baseline.md`](specification/requirements-baseline.md) | **需求基线** — 功能需求/NFR/约束/部署规模/能力梯度/RTM 表/版本边界 |
 | [`specification/system-context.md`](specification/system-context.md) | **系统上下文** — 边界声明 + 外部依赖 |
 | [`specification/use-cases.md`](specification/use-cases.md) | **使用场景** — 8 个典型交互场景 |
-| [`specification/rl-weight-spec.md`](specification/rl-weight-spec.md) | **RL 权重优化器规格** — 五维权重 + 学习算法 |
+| [`specification/rl-weight-spec.md`](specification/rl-weight-spec.md) | **RL 权重优化器规格** — 六维权重（含 entity_boost）+ 学习算法 |
 | [`specification/operation-catalog.md`](specification/operation-catalog.md) | **操作目录** — 53 项标准操作，按 ENC/RET/STR 三阶段组织，标注安全红线 |
 
 ## 开发文档（怎么上手开发）
@@ -60,7 +60,7 @@ status: draft
 | [`governance/adr.md`](governance/adr.md) | **架构决策记录** — 10 项已采纳 ADR |
 | [`governance/debt-collection.md`](governance/debt-collection.md) | **追缴清单** — 已闭环项 + 待实现债务路线图 |
 | [`governance/risks.md`](governance/risks.md) | **风险登记册** — 架构风险与哲学张力 |
-| [`governance/project-plan.md`](governance/project-plan.md) | **项目计划** — 4 Phase × 12 周里程碑 |
+| [`governance/project-plan.md`](governance/project-plan.md) | **项目计划** — 4 Phase 里程碑（具体周数待代码启动后定） |
 | [`governance/changelog.md`](governance/changelog.md) | **变更日志** — 语义化版本变更记录 |
 | [`governance/social-calibration-roadmap.md`](governance/social-calibration-roadmap.md) | **社会性校准演进路线图** — v1.0→v2.0 里程碑 |
 | [`governance/cognitive-architecture-gap.md`](governance/cognitive-architecture-gap.md) | **认知-架构承诺差距表** — 12 项降维/预留/偏离追踪 |
@@ -72,7 +72,7 @@ status: draft
 | 路径 | 内容 |
 |:-----|:-----|
 | [`ops/deployment.md`](ops/deployment.md) | **部署指南** — 三级部署规模（轻量/标准/全量）+ 三级能力梯度（全量/标准/内核），环境变量、Docker 参考 |
-| [`ops/configuration.md`](ops/configuration.md) | **配置参数参考** — 60+ 项参数 + 动态调参规则 |
+| [`ops/configuration.md`](ops/configuration.md) | **配置参数参考** — 94 项参数 + 动态调参规则 |
 | [`ops/reliability.md`](ops/reliability.md) | **可靠性策略** — RTO/RPO、备份、WAL 归档、LLM 熔断 |
 | [`ops/observability.md`](ops/observability.md) | **可观测性设计** — 指标/日志/告警/检测器可见性 |
 | [`ops/troubleshooting.md`](ops/troubleshooting.md) | **故障排查** — 常见问题与恢复命令 |

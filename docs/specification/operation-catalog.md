@@ -43,10 +43,10 @@ status: draft
 | 文本检索 | GET /v1/memories?q={query} | — | S-02 | 关键词全文检索（对应 requirements-baseline R-02） |
 | 路径检索 | GET /v1/path | kairos_tree | S-02 | 确定性前缀匹配 |
 | 路径空间浏览 | GET /v1/path/tree | kairos_tree | S-02 | 树状浏览 |
-| 实体图谱检索 | POST /v1/graph/search | graph_search | S-02 | 递归 CTE 多跳 |
+| 实体图谱检索 | POST /v1/graph/search | kairos_search_graph | S-02 | 递归 CTE 多跳 |
 | 时间序检索 | GET /v1/memories?sort=created_at | — | S-02 | 纯时间轴，与热度解耦 |
 | 分块检索 | 写入自动分块，检索时关联 | — | — | 200-600 字重叠窗口 |
-| 会话列表 | GET /v1/sessions | sessions_list | S-02 | |
+| 会话列表 | GET /v1/sessions | kairos_search_sessions | S-02 | |
 | 会话消息 | GET /v1/sessions/{id}/messages | — | S-02 | 游标分页 |
 | 知识演化链 | GET /v1/evolution/{id} | — | — | replaces/enriches/confirms/challenges |
 | 聚合健康报告 | GET /v1/health/detail | — | — | 按 type/state 聚合 + flags |
@@ -70,7 +70,7 @@ status: draft
 | 路径抑制 | POST /v1/path/suppress | — | S-16/S-17 | 路径级检索抑制 |
 | 区推进 | POST /v1/halls/promote | — | — | 加工区→验证区→正式库 |
 | 区退回 | POST /v1/halls/demote | — | — | 验证区→加工区 |
-| 反馈记录 | POST /v1/playbooks/{id}/feedback | kairos_feedback_memory | — | Playbook outcome 记录 |
+| 反馈记录 | POST /v1/playbooks/{id}/feedback | kairos_feedback_playbook | — | Playbook outcome 记录 |
 | Playbook 创建 | POST /v1/playbooks | — | — | 升华 strategy 产出 |
 | 外部校准 | POST /v1/calibrate | kairos_calibrate | S-11 | 见证锚定更新 |
 | 宪法管理 | POST /v1/constitution | — | S-11（唯一入口） | 宪法级偏好查看/修订 |

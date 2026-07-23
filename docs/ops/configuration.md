@@ -105,8 +105,8 @@ status: draft
 
 | 参数 | 默认值 | 说明 |
 |:-----|:-------|:-----|
-| `KAIROS_PROVIDER_DEFAULT_ACCURACY` | 0.5 | 新 Provider 参与加权前的默认历史准确率 |
-| `KAIROS_PROVIDER_MIN_CALIBRATION_EVENTS` | 5 | 新 Provider 参与加权所需的最小校准事件数 |
+| `KAIROS_PROVIDER_DEFAULT_ACCURACY` | 0.5 | 新 Provider 参与加权前的默认历史准确率（v1.0 默认关闭，v1.1+ 启用加权） |
+| `KAIROS_PROVIDER_MIN_CALIBRATION_EVENTS` | 5 | 新 Provider 参与加权所需的最小校准事件数（v1.0 默认关闭，v1.1+ 启用加权） |
 | `KAIROS_DAILY_BUDGET_FEN` | 20000 | LLM 日预算上限（分，约 ¥200/天） |
 
 ### §7 安全红线
@@ -189,7 +189,8 @@ status: draft
 | `KAIROS_RL_WEIGHT_RELEVANCE` | 0.4 | RL 相关性权重初始值 |
 | `KAIROS_RL_WEIGHT_RECENCY` | 0.2 | RL 新鲜度权重初始值 |
 | `KAIROS_RL_WEIGHT_FREQUENCY` | 0.15 | RL 频率权重初始值 |
-| `KAIROS_RL_WEIGHT_USER_FEEDBACK` | 0.15 | RL 用户反馈权重初始值 |
+| `KAIROS_RL_WEIGHT_EXPLICIT_FEEDBACK` | 0.15 | RL 显式反馈权重初始值（用户 👍/👎） |
+| `KAIROS_RL_WEIGHT_ENTITY_BOOST` | 0.05 | RL 实体提升权重初始值（v1.0 默认 0.05，v1.1+ 激活完整加权） |
 | `KAIROS_RL_WEIGHT_TRUST_SCORE` | 0.10 | RL 可信度权重初始值 |
 
 ### §10 遗忘与检索参数

@@ -81,6 +81,7 @@ status: draft
 | 嵌入服务可用 | 需要 LLM Provider 或本地嵌入模型提供向量化能力 |
 | 宿主 Agent 有 API Key | 所有外部交互需经过 API Key 鉴权 |
 | 单进程部署 | 当前架构假设 Kairos 为单进程服务（多进程需外部负载均衡） |
+| P6 维度保护（受控偏离） | v1.0 实际压缩比 ~33–43%，详见架构 §10.11 |
 
 ## 三、外部依赖
 
@@ -88,7 +89,7 @@ status: draft
 |:----|:----:|:---------|
 | PostgreSQL 15+ | 标准模式必需 | 轻量模式 SQLite |
 | pgvector 0.5+ | 标准模式必需 | 轻量模式 sqlite-vec |
-| 嵌入模型 API | 标准模式必需（text-embedding-3-small 1536 维） | 轻量模式 BGE-M3 1024 维（标准模式不可切 BGE-M3，维数受 NFR 基线约束） |
+| 嵌入模型 API | 标准模式必需（text-embedding-3-small 1536 维） | 轻量模式 BGE-M3 1024 维（线性投影至 1536，DDL 以 1536 为准。标准模式不可切 BGE-M3，维数受 NFR 基线约束） |
 | LLM Provider API | 升华必需 | 升华可禁用（`--no-sublimation`） |
 | 外部校准信号 | 治理必需 | 虚拟校准（受限模式） |
 

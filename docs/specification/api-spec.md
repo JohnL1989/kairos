@@ -424,12 +424,15 @@ status: draft
   "event_id": "uuid",
   "event_type": "calibration_signal | degradation_switch | use_event | intention_activate | intention_resolve | affective_boost | exploration_budget | latent_trigger | attention_allocation | sublimation_tick",
   "source": "storage_layer | strategy_layer | wm_layer | metacognition_layer | sovereignty_plane",
+  "target": "broadcast | specific_layer | specific_component",
+  "trace_id": "uuid",
   "priority": 0,
   "payload": {},
-  "timestamp": "2026-07-20T10:00:00Z",
-  "ttl_seconds": 300
+  "timestamp": "2026-07-20T10:00:00Z"
 }
 ```
+
+> **v1.0 简化**：`target` 默认为 `broadcast` 时表示全层广播（事件类型隐式决定接收层），`trace_id` 在同步事件中为空。`priority` 范围为 0–9（0 为默认，v1.0 仅使用 0/1/2），事件时效由接收方按 event_type 的预设 TTL 处理（参见架构 §10.10 事件类型原语表）。
 
 > **临时契约声明**：临时契约记忆在过期清除时不产生审计事件——其生命周期（创建→过期→清除）被视为瞬态操作，不留审计痕迹。此行为与 S-15（来源可鉴别）不冲突：临时契约在写入时仍记录 provenance，仅在过期清除阶段不产生审计日志。
 
@@ -632,7 +635,7 @@ status: draft
   "by_state": {"active": 1200, "stale": 200, "archived": 80, "suppressed": 30, "superseded": 20},
   "growth_7d": {"semantic": 15, "episodic": 8},
   "flags": {"needs_verification": 5, "contradiction": 2, "p6_deviation": true},
-  "rl_weights": {"relevance": 0.42, "recency": 0.18, "frequency": 0.15, "user_feedback": 0.14, "trust_score": 0.11},
+  "rl_weights": {"relevance": 0.40, "recency": 0.20, "frequency": 0.15, "explicit_feedback": 0.15, "entity_boost": 0.05, "trust_score": 0.10},
   "maintenance": {"last_light": "ISO8601", "last_deep": "ISO8601"}
 }
 ```

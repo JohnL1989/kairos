@@ -64,7 +64,6 @@ kairos logs --follow                # 实时追踪（轻量模式）
 ```bash
 # 备份完整配置和密钥
 cp ~/.kairos/.env ~/.kairos/.env.bak    # 备份环境配置（见 deployment.md §三）
-cp ~/.kairos/.env ~/.kairos/.env.bak
 ```
 
 ### 2.3 恢复验证

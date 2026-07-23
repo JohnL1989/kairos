@@ -30,6 +30,7 @@ status: draft
 | `path` | TEXT | NOT NULL, UNIQUE(path, version) | kairos:// 路径。同路径多条记忆通过递增 version 写入（首次写入 version=1，后续写入 version 递增） |
 | `version` | INTEGER | DEFAULT 1 | 版本号，更新时递增 |
 | `content` | TEXT | NOT NULL | 记忆内容 |
+| `content_summary` | TEXT | — | 记忆摘要（由升华管道生成，用于 RL1 中层检索。v1.0 统一 1536 维单向量；128 维摘要向量与 2048 维全量向量为 v1.1+ 检索深度分级目标，见架构 §3.9） |
 | `content_hash` | TEXT | NOT NULL | SHA-256(content) |
 | `embedding` | VECTOR(1536) | —（向量检索时 NULL 记录被自动跳过） | 语义向量。标准模式 1536 维（text-embedding-3-small）；轻量模式 1536 维（BGE-M3，原生 1024 维线性投影至 1536），DDL 以 1536 为准 |
 | `memory_types` | JSONB | NOT NULL | JSON 数组：["episodic", "narrative", "semantic", "procedural"] 可组合，一条记忆可同时属于多类型 |
@@ -563,4 +564,4 @@ status: draft
 
 | 版本 | 日期 | 说明 |
 |:----|:----|:-----|
-| v1.0.0 | 2026-07-23 | 数据模型设计定稿（文档仍保持 draft 状态——无运行代码验证）。核心记忆表 29+ 字段（含 hall 知识加工区标识、calibration_confidence 校准置信度、VAD 情感三维、encoding_context 编码情境）。扩展字段：solution_branch_id（谱系分支）、distill_level（蒸馏层级 0-4）、extinction_status（灭绝状态）、lma_urn（MTL 逻辑地址）。双副本分离：witness_anchor 见证锚定表（含叙事自洽度/校准历史）与 usage_weight 使用权重表（含五级负载系数）。新增表：solution_branches、extinction_fossils、memory_relations、entity_communities 等（注：vector_collections 与 community_detection 为早期命名，实际对应实体嵌入直接存储于 memories.embedding 列，社区发现使用 entity_communities 表）。注册表逻辑结构（九类根键/路径/值类型/写入权限定义）。 |
+| v1.0.0 | 2026-07-23 | 数据模型设计定稿（文档仍保持 draft 状态——无运行代码验证）。核心记忆表 30+ 字段（新增 content_summary 摘要列；含 hall 知识加工区标识、calibration_confidence 校准置信度、VAD 情感三维、encoding_context 编码情境）。扩展字段：solution_branch_id（谱系分支）、distill_level（蒸馏层级 0-4）、extinction_status（灭绝状态）、lma_urn（MTL 逻辑地址）。双副本分离：witness_anchor 见证锚定表（含叙事自洽度/校准历史）与 usage_weight 使用权重表（含五级负载系数）。新增表：solution_branches、extinction_fossils、memory_relations、entity_communities 等（注：vector_collections 与 community_detection 为早期命名，实际对应实体嵌入直接存储于 memories.embedding 列，社区发现使用 entity_communities 表）。注册表逻辑结构（九类根键/路径/值类型/写入权限定义）。v1.0 统一 1536 维单向量，128/2048 为 v1.1+ 目标（见架构 §3.9）。 |

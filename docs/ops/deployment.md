@@ -57,6 +57,7 @@ status: draft
 | 变量 | 必填 | 默认值 | 说明 |
 |:----|:----|:-------|:-----|
 | `KAIROS_DB_DSN` | 标准模式必填；轻量模式（SQLite）自动创建 | `sqlite:///$HOME/.kairos/kairos.db`（轻量模式，与 backup/restore 路径一致） | 数据库连接串 |
+| `KAIROS_LOG_LEVEL` | 否 | `info` | 日志级别：`debug|info|warn|error`（见 §五 日志级别说明） |
 | `KAIROS_LITE_MODE` | 否 | `true` | 轻量模式开关（true=SQLite/false=PostgreSQL）。设为 false 时需配置 `KAIROS_DB_DSN` |
 | `KAIROS_DB_PASSWORD` | 标准模式需 | — | PostgreSQL 密码（docker-compose 部署用，非 DSN 内部含密码时不需要） |
 | `KAIROS_API_KEY` | 是 | — | API 认证密钥 |
@@ -72,7 +73,7 @@ status: draft
 | `KAIROS_DAILY_BUDGET_FEN` | 否 | 20000 | LLM 日预算上限（分） |
 | `KAIROS_CORE_LIMIT_BYTES` | 否 | 25KB | 常驻契约索引上限 |
 | `KAIROS_CORE_LIMIT_LINES` | 否 | 200 | 常驻契约索引行数上限 |
-| `KAIROS_SEARCH_DEFAULT_LIMIT` | 否 | 5 | 默认召回上限 |
+| `KAIROS_SEARCH_DEFAULT_LIMIT` | 否（deployment 自定） | 5 | 默认召回上限（非 configuration.md 的标准参数，属部署时覆盖） |
 | `KAIROS_RATE_LIMIT_WRITE_PER_MIN` | 否 | 60 | 写操作限流（单客户端级别） |
 | `KAIROS_RATE_LIMIT_READ_PER_MIN` | 否 | 120 | 读操作限流 |
 | `KAIROS_INPUT_LIMIT_CONTENT_BYTES` | 否 | 65536 | 单条内容上限（字节） |

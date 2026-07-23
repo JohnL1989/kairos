@@ -115,7 +115,7 @@ for r in results:
 
 ---
 
-## 五、MCP 集成
+## 七、MCP 集成
 
 Kairos 通过独立的 MCP Bridge 服务器进程暴露能力给 Hermes Agent：
 
